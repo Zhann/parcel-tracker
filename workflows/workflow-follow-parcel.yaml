@@ -1,5 +1,5 @@
 id: afc70310-2c33-4dad-893d-4f1c9217f93b
-name: follow-parcel
+name: "@zhann/follow-parcel"
 description: >-
   Follow one bpost parcel until it is delivered or picked up: look once, so a
   wrong code or postal code fails at once, then keep looking, paced by where
@@ -37,7 +37,7 @@ jobs:
         description: Look once and write the status; fails on a code bpost does not know.
         task:
           type: behavior
-          behaviorType: "@silverfin/bpost-parcel"
+          behaviorType: "@zhann/bpost-parcel"
           behaviorName: bpost-${{ inputs.code }}
           methodName: snapshot
           globalArgs:
@@ -50,7 +50,7 @@ jobs:
         description: Keep looking, paced by phase, until delivered, picked up, or maxHours.
         task:
           type: behavior
-          behaviorType: "@silverfin/bpost-parcel"
+          behaviorType: "@zhann/bpost-parcel"
           behaviorName: bpost-${{ inputs.code }}
           methodName: follow
           globalArgs:

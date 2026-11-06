@@ -1,6 +1,6 @@
 /**
  * The TUI's only way in or out: the swamp CLI. Reads go through
- * `swamp data query`; actions start the `follow-parcel` workflow or run a
+ * `swamp data query`; actions start the `@zhann/follow-parcel` workflow or run a
  * behavior method. Nothing here reads `.swamp/` directly.
  *
  * @module
@@ -74,7 +74,7 @@ export const CODE_PATTERN = /^[A-Za-z0-9]{8,40}$/;
 export const POSTCODE_PATTERN = /^[A-Za-z0-9 -]{3,10}$/;
 
 /**
- * Start `follow-parcel` detached from the TUI, so quitting the TUI or closing
+ * Start `@zhann/follow-parcel` detached from the TUI, so quitting the TUI or closing
  * its pane leaves it running. Its output goes to `logs/<code>.log`.
  */
 export async function startFollow(repoDir: string, p: NewParcel): Promise<string> {
@@ -85,7 +85,7 @@ export async function startFollow(repoDir: string, p: NewParcel): Promise<string
   const args = [
     "workflow",
     "run",
-    "follow-parcel",
+    "@zhann/follow-parcel",
     "--repo-dir",
     repoDir,
     "--input",
@@ -114,7 +114,7 @@ export async function startFollow(repoDir: string, p: NewParcel): Promise<string
   return log;
 }
 
-/** Ids of the running `follow-parcel` runs for a tracking code. */
+/** Ids of the running `@zhann/follow-parcel` runs for a tracking code. */
 export async function runningFollows(run: Runner, code: string): Promise<string[]> {
   if (!CODE_PATTERN.test(code)) return [];
   const r = await run([
@@ -123,7 +123,7 @@ export async function runningFollows(run: Runner, code: string): Promise<string[
     "search",
     "--json",
     "--filter",
-    `workflowName == "follow-parcel" && status == "running" && inputs.code == "${code}"`,
+    `workflowName == "@zhann/follow-parcel" && status == "running" && inputs.code == "${code}"`,
   ]);
   if (!r.ok) throw new Error(errorOf(r.stderr));
   return (JSON.parse(r.stdout).results ?? []).map((x: { runId: string }) => x.runId);

@@ -1,5 +1,6 @@
 import { assert, assertEquals, assertRejects } from "jsr:@std/assert@1.0.13";
 import {
+  BEHAVIOR_TYPE,
   brusselsDay,
   checkOnce,
   type Deps,
@@ -7,6 +8,7 @@ import {
   historyDurations,
   MAX_FAILURES,
   type MethodContext,
+  model,
   type Round,
   type Status,
 } from "./bpost_parcel.ts";
@@ -93,6 +95,10 @@ function fakeContext(
   return { ctx, store, logs };
 }
 
+Deno.test("the model's literal type is the one its data is queried by", () => {
+  assertEquals(model.type, BEHAVIOR_TYPE);
+});
+
 Deno.test("brusselsDay uses Brussels time, not UTC", () => {
   assertEquals(brusselsDay(new Date("2026-11-06T23:30:00Z")), "2026-11-07");
 });
@@ -160,9 +166,33 @@ Deno.test("follow retries transient failures, then gives up", async () => {
   await assertRejects(() => follow(fakeContext().ctx, broken.deps, 120), Error, "HTTP 502");
 });
 
+Deno.test("a failed look shows its error until the next good look", async () => {
+  const { ctx, store } = fakeContext();
+  const { deps } = fakeWorld([[OUT, NO_ROUND], "fail", [DELIVERED]]);
+  await follow(ctx, deps, 120);
+
+  const [first, failed, delivered] = store.get("status") as Status[];
+  assertEquals(first.error, null);
+  assertEquals(failed.error, "bpost answered HTTP 502 for /track/items");
+  assertEquals(failed.following, true);
+  assertEquals(Date.parse(failed.nextCheckAt!) - Date.parse(first.checkedAt), 120_000);
+  assertEquals(delivered.error, null);
+});
+
 Deno.test("follow stops at an unknown parcel", async () => {
   const { deps } = fakeWorld([[{ items: [] }]]);
   await assertRejects(() => follow(fakeContext().ctx, deps, 120), ParcelNotFound);
+});
+
+Deno.test("a follow that ends on an error leaves a status that says so", async () => {
+  const { ctx, store } = fakeContext();
+  const { deps } = fakeWorld([[IN_TRANSIT], [{ items: [] }]]);
+  await assertRejects(() => follow(ctx, deps, 120), ParcelNotFound);
+
+  const final = store.get("status")!.at(-1) as Status;
+  assert(final.error, "the status carries the error");
+  assertEquals(final.following, false);
+  assertEquals(final.nextCheckAt, null);
 });
 
 Deno.test("follow stops at the deadline", async () => {

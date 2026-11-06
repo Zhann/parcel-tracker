@@ -1,7 +1,17 @@
 manifestVersion: 1
-name: "@silverfin/bpost-parcel"
+name: "@zhann/bpost-parcel"
 version: "2026.11.06.1"
+license: MIT
 description: "A bpost parcel followed from announcement to the doorstep: status, round stops, pace and ETA."
+labels:
+  - bpost
+  - parcel
+  - tracking
 
 models:
   - bpost_parcel.ts
+workflows:
+  - workflow-follow-parcel.yaml
+additionalFiles:
+  - README.md
+  - LICENSE

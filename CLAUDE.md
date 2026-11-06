@@ -9,7 +9,7 @@ followed by the issue's full URL.
 
 ## Layout
 
-- `extensions/models/bpost_parcel.ts` — the `@silverfin/bpost-parcel` behavior:
+- `extensions/models/bpost_parcel.ts` — the `@zhann/bpost-parcel` behavior:
   `snapshot`, `follow`, `archive`, `unarchive`.
 - `extensions/models/_lib/bpost.ts` — the two bpost endpoints and the
   allow-list parse. Nothing about the receiver (name, street, coordinates) is
@@ -23,10 +23,19 @@ followed by the issue's full URL.
 ```bash
 deno task check   # fmt, lint, type-check
 deno task test    # no network
-swamp workflow validate follow-parcel
+swamp workflow validate @zhann/follow-parcel
 ```
 
 Never point `.swamp.yaml` at a shared datastore.
+
+## Publishing
+
+The extension is published to swamp-club as `@zhann/bpost-parcel` from
+`extensions/models/manifest.yaml`; its `README.md` and `LICENSE` beside the
+manifest ship with it. Every workflow name and behavior type in it carries the
+`@zhann/` prefix, or the push refuses it. A new version bumps `version` in the
+manifest and `model.version` together, then follows the `swamp` skill's
+publishing guide: the push wants a review report bound to the exact code.
 
 <!-- BEGIN swamp managed section - DO NOT EDIT -->
 # Project

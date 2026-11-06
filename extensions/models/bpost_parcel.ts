@@ -5,7 +5,7 @@
  * paced by where the parcel is (see {@link nextCheckSeconds}): every 15
  * minutes in transit, every minute once it is out for delivery, every 30
  * seconds while the postman's round is live, and it returns when the parcel
- * is delivered or picked up. The `follow-parcel` workflow runs the two.
+ * is delivered or picked up. The `@zhann/follow-parcel` workflow runs the two.
  *
  * Every look writes the `status` resource, which is what the TUI shows; while
  * the round is live it also appends to that day's `round` resource, whose
@@ -30,8 +30,13 @@ import {
 } from "./_lib/bpost.ts";
 import { estimate, type Eta, type RoundSample, stopDurations } from "./_lib/pace.ts";
 
-export const BEHAVIOR_TYPE = "@silverfin/bpost-parcel";
+/**
+ * The behavior type, for queries over this behavior's data. `model.type` repeats
+ * it as a literal, which is what the registry catalog reads.
+ */
+export const BEHAVIOR_TYPE = "@zhann/bpost-parcel";
 
+/** One parcel: its tracking code and postal code, and how to show it. */
 const GlobalArgsSchema = z.object({
   itemCode: z.string().regex(/^[A-Za-z0-9]{8,40}$/).describe(
     "The bpost tracking code (barcode) of the parcel.",
@@ -47,6 +52,7 @@ const GlobalArgsSchema = z.object({
   ),
 });
 
+/** The parsed global arguments of one parcel. */
 type GlobalArgs = z.infer<typeof GlobalArgsSchema>;
 
 const EventSchema = z.object({
@@ -75,6 +81,10 @@ const EtaSchema = z.object({
   latest: z.string(),
 });
 
+/**
+ * The `status` resource: the parcel as last seen, with the round's latest
+ * sample and the ETA while the round is live.
+ */
 const StatusSchema = z.object({
   itemCode: z.string(),
   label: z.string(),
@@ -99,14 +109,17 @@ const StatusSchema = z.object({
   error: z.string().nullable(),
 });
 
+/** The parcel as last seen; the `status` resource's content. */
 export type Status = z.infer<typeof StatusSchema>;
 
+/** The `round` resource: one delivery day's stop counts over time. */
 const RoundSchema = z.object({
   roundName: z.string().nullable(),
   day: z.string(),
   samples: z.array(RoundSampleSchema),
 });
 
+/** One delivery day's round; the `round` resource's content. */
 export type Round = z.infer<typeof RoundSchema>;
 
 /** The slice of swamp's method context this behavior uses. */
@@ -134,8 +147,16 @@ export interface Deps {
   sleep: (ms: number, signal?: AbortSignal) => Promise<void>;
 }
 
+/** A look that hangs this long fails, and is retried like any other failure. */
+const FETCH_TIMEOUT_MS = 30_000;
+
+/** The real network, clock and an abortable sleep. */
 export const realDeps: Deps = {
-  fetch: (url) => fetch(url, { headers: { "accept": "application/json" } }),
+  fetch: (url) =>
+    fetch(url, {
+      headers: { "accept": "application/json" },
+      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+    }),
   now: () => new Date(),
   sleep: (ms, signal) =>
     new Promise((resolve, reject) => {
@@ -271,14 +292,20 @@ export const MAX_FAILURES = 30;
 
 /**
  * Look, wait, look again until the parcel is done or the deadline passes.
- * A transient failure (network, bpost 5xx) is logged and retried a minute
- * later; a parcel bpost no longer knows ends the follow with an error.
+ * A transient failure (network, bpost 5xx) is logged, shown as the status's
+ * `error` and retried a minute later; the next good look clears it. A parcel
+ * bpost no longer knows, or {@link MAX_FAILURES} failures in a row, end the
+ * follow with the error on a status that is no longer following.
  */
 export async function follow(
   ctx: MethodContext,
   deps: Deps,
   maxHours: number,
 ): Promise<{ name: string }[]> {
+  ctx.logger.info("following {code} for up to {h} hours", {
+    code: ctx.globalArgs.itemCode,
+    h: maxHours,
+  });
   const deadline = deps.now().getTime() + maxHours * 3600_000;
   const history: HistoryCache = new Map();
   let failures = 0;
@@ -300,14 +327,20 @@ export async function follow(
         stops: status.round ? ` (${status.round.stops} stops)` : "",
       });
     } catch (err) {
-      if (err instanceof ParcelNotFound) throw err;
       if (ctx.signal?.aborted) throw err;
-      failures++;
-      ctx.logger.warn("look {n} failed: {error}", {
-        n: failures,
-        error: err instanceof Error ? err.message : String(err),
-      });
-      if (failures >= MAX_FAILURES) throw err;
+      const error = err instanceof Error ? err.message : String(err);
+      const fatal = err instanceof ParcelNotFound || ++failures >= MAX_FAILURES;
+      ctx.logger.warn("look {n} failed: {error}", { n: failures, error });
+      last ??= await ctx.readResource(STATUS) as Status | null;
+      if (last) {
+        last = fatal ? { ...last, error, following: false, nextCheckAt: null } : {
+          ...last,
+          error,
+          nextCheckAt: new Date(deps.now().getTime() + 60_000).toISOString(),
+        };
+        handle = await ctx.writeResource("status", STATUS, last);
+      }
+      if (fatal) throw err;
       waitSeconds = 60;
     }
 
@@ -329,11 +362,17 @@ export async function follow(
 async function setArchived(ctx: MethodContext, archived: boolean) {
   const status = await ctx.readResource(STATUS) as Status | null;
   if (!status) throw new Error("no status yet: run snapshot or follow first");
-  return await ctx.writeResource("status", STATUS, { ...status, archived });
+  const handle = await ctx.writeResource("status", STATUS, { ...status, archived });
+  ctx.logger.info(archived ? "archived {code}" : "unarchived {code}", { code: status.itemCode });
+  return handle;
 }
 
+/**
+ * The `@zhann/bpost-parcel` behavior: one instance per parcel, with the
+ * `snapshot`, `follow`, `archive` and `unarchive` methods.
+ */
 export const model = {
-  type: BEHAVIOR_TYPE,
+  type: "@zhann/bpost-parcel",
   version: "2026.11.06.1",
   globalArguments: GlobalArgsSchema,
   resources: {
@@ -357,7 +396,8 @@ export const model = {
       description: "Look at the parcel once and write its status.",
       arguments: z.object({}),
       execute: async (_args: Record<string, never>, ctx: MethodContext) => {
-        const { handle } = await checkOnce(ctx, realDeps, { following: false });
+        const { status, handle } = await checkOnce(ctx, realDeps, { following: false });
+        ctx.logger.info("{phase}: {text}", { phase: status.phase, text: status.step.text });
         return { dataHandles: [handle] };
       },
     },

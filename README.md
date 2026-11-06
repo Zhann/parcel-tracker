@@ -23,16 +23,16 @@ Swamp workflow that follows a bpost parcel to the doorstep, with a terminal view
 deno task tui                       # PARCEL_POSTCODE=9050 pre-fills the postal code
 ```
 
-`a` adds a parcel by starting the `follow-parcel` workflow in the background; it
+`a` adds a parcel by starting the `@zhann/follow-parcel` workflow in the background; it
 keeps running after the TUI quits. Without the TUI:
 
 ```bash
-swamp workflow run follow-parcel --input code=<tracking code> --input postcode=<postal code> --input label=<name>
+swamp workflow run @zhann/follow-parcel --input code=<tracking code> --input postcode=<postal code> --input label=<name>
 ```
 
 ## How it works
 
-The `@silverfin/bpost-parcel` behavior reads the two public endpoints bpost's
+The `@zhann/bpost-parcel` behavior reads the two public endpoints bpost's
 own tracking page uses: `/track/items` for the step, window and timeline, and
 `/track/itemonroundstatus` for the stops left once the postman's round is live.
 `follow` looks every 15 minutes in transit, every minute once out for delivery,

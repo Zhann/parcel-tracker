@@ -2,7 +2,7 @@
  * The parcel TUI: `deno task tui` from the repo root.
  *
  * Reads every parcel's status from swamp every few seconds and redraws every
- * second. Adding a parcel starts the `follow-parcel` workflow detached, so the
+ * second. Adding a parcel starts the `@zhann/follow-parcel` workflow detached, so the
  * follow outlives the TUI; the TUI is only ever a window onto swamp's data.
  *
  * PARCEL_POSTCODE pre-fills the postal code when adding.
