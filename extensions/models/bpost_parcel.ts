@@ -29,6 +29,7 @@ import {
   trackParcel,
 } from "./_lib/bpost.ts";
 import { estimate, type Eta, type RoundSample, stopDurations } from "./_lib/pace.ts";
+import { brusselsDay } from "./_lib/format.ts";
 
 /**
  * The behavior type, for queries over this behavior's data. `model.type` repeats
@@ -173,15 +174,7 @@ export const realDeps: Deps = {
     }),
 };
 
-/** The Brussels calendar day of an instant, `YYYY-MM-DD`. */
-export function brusselsDay(at: Date): string {
-  return new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Europe/Brussels",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(at);
-}
+export { brusselsDay };
 
 const STATUS = "status";
 const roundInstance = (day: string) => `round-${day}`;
@@ -373,7 +366,15 @@ async function setArchived(ctx: MethodContext, archived: boolean) {
  */
 export const model = {
   type: "@zhann/bpost-parcel",
-  version: "2026.11.06.1",
+  version: "2026.11.06.2",
+  upgrades: [
+    {
+      toVersion: "2026.11.06.2",
+      description: "Adds the @zhann/parcel-report report; arguments unchanged.",
+      upgradeAttributes: (old: Record<string, unknown>) => old,
+    },
+  ],
+  reports: ["@zhann/parcel-report"],
   globalArguments: GlobalArgsSchema,
   resources: {
     status: {

@@ -22,22 +22,38 @@ The run lasts as long as the parcel's journey (`maxHours`, 120 by default). It l
 minutes in transit, every minute once the parcel is out for delivery, every 30 seconds while the
 round is live (the rate bpost's page uses), and hourly while the parcel waits at a pickup point.
 
-## Read what it found
+## Where is it now?
 
-Each parcel is a behavior named `bpost-<tracking code>`. Its `status` resource holds the step,
-bpost's delivery window, the timeline, the stops left and the ETA:
+Each parcel is a behavior named `bpost-<tracking code>`. `snapshot` looks once and prints the
+`@zhann/parcel-report` report, which every method of the behavior runs:
 
 ```bash
+swamp behavior run bpost-<tracking code> snapshot
+```
+
+```text
+## Desk — out for delivery
+
+On the way to you · bpack 24h pro · 0.5 kg
+
+- **ETA** 11:30, in 30 min (11:21–11:40)
+- **Stops** 12 left · 41% done · round Res-318
+- **Van** 1.8 km away
+- **Pace** 2m40 a stop (p25 1m55 · p75 3m30) · live, 14 stops
+- **bpost** today 11:10–14:15
+- **Checked** 10:59 · following, next look 11:00
+```
+
+Times are Brussels time. The last report is kept, and the `status` resource holds everything behind
+it:
+
+```bash
+swamp report get @zhann/parcel-report --behavior bpost-<tracking code> --markdown
 swamp data query 'modelType == "@zhann/bpost-parcel" && specName == "status"' \
   --select content --json
 ```
 
-One look without following, and hiding a delivered parcel:
-
-```bash
-swamp behavior run bpost-<tracking code> snapshot
-swamp behavior run bpost-<tracking code> archive
-```
+Hide a delivered parcel with `swamp behavior run bpost-<tracking code> archive`.
 
 ## How the ETA is worked out
 

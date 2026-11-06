@@ -15,6 +15,9 @@ followed by the issue's full URL.
   allow-list parse. Nothing about the receiver (name, street, coordinates) is
   ever written; keep it that way, and keep fixtures scrubbed.
 - `extensions/models/_lib/pace.ts` — pace and ETA from the round's stop counts.
+- `extensions/models/_lib/format.ts` — times and words, shared by the report and the TUI.
+- `extensions/reports/parcel_report.ts` — `@zhann/parcel-report`, the parcel at a
+  glance after every method; what someone with the extension and no TUI reads.
 - `workflows/workflow-follow-parcel.yaml` — snapshot, then follow.
 - `tui/` — the terminal view; it only talks to swamp through the CLI.
 

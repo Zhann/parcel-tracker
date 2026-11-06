@@ -1,8 +1,8 @@
 {
   "tasks": {
     "tui": "deno run --allow-run=swamp,setsid --allow-env --allow-read --allow-write=logs tui/main.ts",
-    "test": "deno test --allow-read extensions/models/ tui/",
-    "check": "deno fmt --check && deno lint && deno check extensions/models/*.ts extensions/models/_lib/*.ts tui/*.ts"
+    "test": "deno test --allow-read extensions/models/ extensions/reports/ tui/",
+    "check": "deno fmt --check && deno lint && deno check extensions/models/*.ts extensions/models/_lib/*.ts extensions/reports/*.ts tui/*.ts"
   },
   "fmt": {
     "lineWidth": 100,

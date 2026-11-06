@@ -9,6 +9,16 @@
  * @module
  */
 import type { Round, Status } from "../extensions/models/bpost_parcel.ts";
+import {
+  clock,
+  duration,
+  eventStamp,
+  fromNow,
+  PHASE_WORD,
+  relativeDay,
+} from "../extensions/models/_lib/format.ts";
+
+export { clock, duration };
 
 export interface Row {
   name: string;
@@ -116,52 +126,6 @@ export function plain(line: Line): string {
   return line.map(([t]) => t).join("");
 }
 
-// ── time ───────────────────────────────────────────────────────────────────
-
-const TZ = "Europe/Brussels";
-
-export function clock(iso: string): string {
-  return new Intl.DateTimeFormat("en-GB", {
-    timeZone: TZ,
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(new Date(iso));
-}
-
-function brusselsDay(at: Date): string {
-  return new Intl.DateTimeFormat("en-CA", {
-    timeZone: TZ,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  })
-    .format(at);
-}
-
-/** `45s`, `2m40`, `1h05`. */
-export function duration(seconds: number): string {
-  const s = Math.max(0, Math.round(seconds));
-  if (s < 60) return `${s}s`;
-  if (s < 3600) return `${Math.floor(s / 60)}m${String(s % 60).padStart(2, "0")}`;
-  return `${Math.floor(s / 3600)}h${String(Math.floor((s % 3600) / 60)).padStart(2, "0")}`;
-}
-
-function relativeDay(day: string, now: Date): string {
-  const today = brusselsDay(now);
-  const tomorrow = brusselsDay(new Date(now.getTime() + 86_400_000));
-  if (day === today) return "today";
-  if (day === tomorrow) return "tomorrow";
-  const [, m, d] = day.split("-");
-  return `${d}/${m}`;
-}
-
-/** An event's Brussels-local `YYYY-MM-DDTHH:MM` as `DD/MM HH:MM`. */
-function eventStamp(at: string): string {
-  const [day, time] = at.split("T");
-  const [, m, d] = day.split("-");
-  return `${d}/${m} ${time}`;
-}
-
 // ── parcel state ───────────────────────────────────────────────────────────
 
 /** A follow whose next look is this late has stopped without saying so. */
@@ -171,14 +135,6 @@ export function isStale(s: Status, now: Date): boolean {
   return s.following && s.nextCheckAt != null &&
     now.getTime() - Date.parse(s.nextCheckAt) > STALE_AFTER_MS;
 }
-
-const PHASE_WORD: Record<Status["phase"], string> = {
-  in_transit: "in transit",
-  out_for_delivery: "out for delivery",
-  at_pickup_point: "at pickup point",
-  returning: "returning",
-  done: "delivered",
-};
 
 /** The list's state cell: glyph, word, colour. */
 export function stateCell(s: Status, now: Date): Seg {
@@ -293,8 +249,7 @@ function detailPane(row: Row | undefined, round: Round | null, now: Date, width:
         S.dim,
       ]]),
     );
-    const inMin = Math.round((Date.parse(eta.likely) - now.getTime()) / 60_000);
-    const when = inMin <= 1 ? "any minute" : `in ${inMin} min`;
+    const when = fromNow(eta.likely, now);
     out.push(
       field("ETA", [[`${clock(eta.earliest)}–${clock(eta.latest)}`, S.bold], [
         ` · likely ${clock(eta.likely)} · ${when}`,
