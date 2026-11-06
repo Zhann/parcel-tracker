@@ -1,0 +1,7 @@
+manifestVersion: 1
+name: "@silverfin/bpost-parcel"
+version: "2026.11.06.1"
+description: "A bpost parcel followed from announcement to the doorstep: status, round stops, pace and ETA."
+
+models:
+  - bpost_parcel.ts
