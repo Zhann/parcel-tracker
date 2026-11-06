@@ -366,7 +366,7 @@ async function setArchived(ctx: MethodContext, archived: boolean) {
  */
 export const model = {
   type: "@zhann/bpost-parcel",
-  version: "2026.11.06.3",
+  version: "2026.11.06.4",
   upgrades: [
     {
       toVersion: "2026.11.06.2",
@@ -376,6 +376,11 @@ export const model = {
     {
       toVersion: "2026.11.06.3",
       description: "Stops showing bpost's round progress as a percentage; arguments unchanged.",
+      upgradeAttributes: (old: Record<string, unknown>) => old,
+    },
+    {
+      toVersion: "2026.11.06.4",
+      description: "Counts a multi-stop drop as one pace observation; arguments unchanged.",
       upgradeAttributes: (old: Record<string, unknown>) => old,
     },
   ],

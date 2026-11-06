@@ -1,6 +1,7 @@
 import { assertAlmostEquals, assertEquals } from "jsr:@std/assert@1.0.13";
 import {
   choosePace,
+  dropCount,
   estimate,
   lastDrop,
   LIVE_ONLY_AFTER,
@@ -31,6 +32,17 @@ Deno.test("stopDurations skips the truncated first stop", () => {
 Deno.test("stopDurations splits a double drop", () => {
   const s = series([10, 9, 9, 9, 9, 7]);
   assertEquals(stopDurations(s), [60, 60]);
+});
+
+Deno.test("a drop of several stops is one observation, not several", () => {
+  // Looks minutes apart, as `snapshot` makes them: one measured drop, of three stops.
+  const sparse = series([35, 35, 33, 30], 130);
+  assertEquals(stopDurations(sparse).length, 3);
+  assertEquals(dropCount(sparse), 1);
+  const eta = estimate(sparse, [], new Date(T0 + 390_000))!;
+  assertEquals(eta.basis, "prior");
+  assertEquals(eta.pace, PRIOR_PACE);
+  assertEquals(eta.intervals, 1);
 });
 
 Deno.test("stopDurations drops breaks and restarts on a reorder", () => {

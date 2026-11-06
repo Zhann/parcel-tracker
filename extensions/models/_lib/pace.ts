@@ -37,7 +37,7 @@ export interface Eta {
   anchor: string;
   pace: Pace;
   basis: PaceBasis;
-  /** Seconds-per-stop durations the pace was taken from. */
+  /** Observations the pace rests on: today's measured drops plus history's durations. */
   intervals: number;
   earliest: string;
   likely: string;
@@ -64,7 +64,20 @@ const ms = (iso: string) => new Date(iso).getTime();
  * the round) starts the measurement again.
  */
 export function stopDurations(samples: RoundSample[]): number[] {
-  const out: number[] = [];
+  return measuredDrops(samples).flatMap(({ each, stops }) => Array(stops).fill(each));
+}
+
+/**
+ * How many drops {@link stopDurations} measured. Looks minutes apart see
+ * several stops fall at once, and the even split of one gap is one
+ * observation however many stops it covers: it is what confidence counts.
+ */
+export function dropCount(samples: RoundSample[]): number {
+  return measuredDrops(samples).length;
+}
+
+function measuredDrops(samples: RoundSample[]): Array<{ each: number; stops: number }> {
+  const out: Array<{ each: number; stops: number }> = [];
   let anchor: RoundSample | null = null;
   let seenFirstDrop = false;
   for (const s of samples) {
@@ -78,11 +91,9 @@ export function stopDurations(samples: RoundSample[]): number[] {
       continue;
     }
     if (s.stops < anchor.stops) {
-      const n = anchor.stops - s.stops;
-      const each = (ms(s.at) - ms(anchor.at)) / 1000 / n;
-      if (seenFirstDrop && each > 0 && each <= MAX_STOP_SECONDS) {
-        for (let i = 0; i < n; i++) out.push(each);
-      }
+      const stops = anchor.stops - s.stops;
+      const each = (ms(s.at) - ms(anchor.at)) / 1000 / stops;
+      if (seenFirstDrop && each > 0 && each <= MAX_STOP_SECONDS) out.push({ each, stops });
       seenFirstDrop = true;
       anchor = s;
     }
@@ -103,24 +114,22 @@ export function percentile(values: number[], p: number): number {
 export function choosePace(
   live: number[],
   history: number[],
+  liveDrops: number = live.length,
 ): { pace: Pace; basis: PaceBasis; intervals: number } {
   let pool: number[];
   let basis: PaceBasis;
-  if (live.length >= LIVE_ONLY_AFTER) {
-    pool = live;
-    basis = "live";
+  let seen: number;
+  if (liveDrops >= LIVE_ONLY_AFTER) {
+    [pool, basis, seen] = [live, "live", liveDrops];
   } else if (live.length > 0 && history.length > 0) {
-    pool = [...live, ...history];
-    basis = "live+history";
+    [pool, basis, seen] = [[...live, ...history], "live+history", liveDrops + history.length];
   } else if (live.length > 0) {
-    pool = live;
-    basis = "live";
+    [pool, basis, seen] = [live, "live", liveDrops];
   } else {
-    pool = history;
-    basis = "history";
+    [pool, basis, seen] = [history, "history", history.length];
   }
-  if (pool.length < MIN_INTERVALS) {
-    return { pace: PRIOR_PACE, basis: "prior", intervals: pool.length };
+  if (seen < MIN_INTERVALS) {
+    return { pace: PRIOR_PACE, basis: "prior", intervals: seen };
   }
   return {
     pace: {
@@ -129,7 +138,7 @@ export function choosePace(
       p75: percentile(pool, 0.75),
     },
     basis,
-    intervals: pool.length,
+    intervals: seen,
   };
 }
 
@@ -152,7 +161,11 @@ export function estimate(
 ): Eta | null {
   const anchor = lastDrop(samples);
   if (!anchor) return null;
-  const { pace, basis, intervals } = choosePace(stopDurations(samples), history);
+  const { pace, basis, intervals } = choosePace(
+    stopDurations(samples),
+    history,
+    dropCount(samples),
+  );
   const stops = anchor.stops;
   const at = (secondsPerStop: number) =>
     new Date(Math.max(now.getTime(), ms(anchor.at) + stops * secondsPerStop * 1000))
