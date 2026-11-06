@@ -80,9 +80,8 @@ export function summarize(s: Status | null, now: Date, failure?: string): Report
     );
   }
   if (live && s.round) {
-    const pct = s.round.progress != null ? ` · ${Math.round(s.round.progress * 100)}% done` : "";
     const round = s.roundName ? ` · round ${s.roundName}` : "";
-    lines.push(`- **Stops** ${s.round.stops} left${pct}${round}`);
+    lines.push(`- **Stops** ${s.round.stops} left${round}`);
     if (s.round.distanceKm != null) {
       lines.push(`- **Van** ${s.round.distanceKm.toFixed(1)} km away`);
     }

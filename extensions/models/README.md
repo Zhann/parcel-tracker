@@ -37,7 +37,7 @@ swamp behavior run bpost-<tracking code> snapshot
 On the way to you · bpack 24h pro · 0.5 kg
 
 - **ETA** 11:30, in 30 min (11:21–11:40)
-- **Stops** 12 left · 41% done · round Res-318
+- **Stops** 12 left · round Res-318
 - **Van** 1.8 km away
 - **Pace** 2m40 a stop (p25 1m55 · p75 3m30) · live, 14 stops
 - **bpost** today 11:10–14:15

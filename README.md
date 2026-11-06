@@ -9,7 +9,7 @@ Swamp workflow that follows a bpost parcel to the doorstep, with a terminal view
                                 │ Step     out for delivery — On the way to you
                                 │ bpost    today 08:00–14:00
                                 │ Round    Res-318
-                                │ Stops    12 left · 41%   █▇▆▅▄
+                                │ Stops    12 left   █▇▆▅▄
                                 │ Pace     2m40 a stop (p25 1m55 · p75 3m30) · live, 14 stops
                                 │ ETA      11:51–12:10 · likely 12:00 · in 30 min
                                 │ Van      1.8 km away · moving

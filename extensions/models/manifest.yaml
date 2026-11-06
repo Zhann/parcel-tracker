@@ -1,6 +1,6 @@
 manifestVersion: 1
 name: "@zhann/bpost-parcel"
-version: "2026.11.06.2"
+version: "2026.11.06.3"
 license: MIT
 description: "A bpost parcel followed from announcement to the doorstep: status, round stops, pace and ETA."
 labels:

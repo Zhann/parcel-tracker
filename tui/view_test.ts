@@ -126,7 +126,8 @@ Deno.test("render fills the screen exactly, wide and narrow", () => {
 Deno.test("render shows the live round in Brussels time", () => {
   const screen = render(view(), NOW, 120, 30).map(strip).join("\n");
   assert(screen.includes("11:30"), "clock in Brussels time");
-  assert(screen.includes("12 left · 41%"));
+  assert(screen.includes("12 left"));
+  assert(!screen.includes("41%"), "bpost's progress is not a percentage");
   assert(screen.includes("2m40 a stop"));
   assert(screen.includes("11:51–12:10"), screen);
   assert(screen.includes("likely 12:00 · in 30 min"));

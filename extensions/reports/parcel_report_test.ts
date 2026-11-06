@@ -58,7 +58,7 @@ Deno.test("a live round reads as ETA, stops, van and pace in Brussels time", () 
   assertStringIncludes(markdown, "## Desk — out for delivery");
   assertStringIncludes(markdown, "On the way to you · bpack 24h pro · 0.5 kg");
   assertStringIncludes(markdown, "- **ETA** 11:30, in 30 min (11:21–11:40)");
-  assertStringIncludes(markdown, "- **Stops** 12 left · 41% done · round Res-318");
+  assertStringIncludes(markdown, "- **Stops** 12 left · round Res-318");
   assertStringIncludes(markdown, "- **Van** 1.8 km away");
   assertStringIncludes(markdown, "- **Pace** 2m40 a stop (p25 1m55 · p75 3m30) · live, 14 stops");
   assertStringIncludes(markdown, "- **bpost** today 11:10–14:15");

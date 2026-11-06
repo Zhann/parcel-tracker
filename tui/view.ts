@@ -226,9 +226,8 @@ function detailPane(row: Row | undefined, round: Round | null, now: Date, width:
   if (s.roundName) out.push(field("Round", [[s.roundName]]));
 
   if (s.round) {
-    const pct = s.round.progress != null ? ` · ${Math.round(s.round.progress * 100)}%` : "";
     const today = round?.samples.map((x) => x.stops) ?? [];
-    const head = `${s.round.stops} left${pct}`;
+    const head = `${s.round.stops} left`;
     out.push(
       field("Stops", [[head, S.bold], ["   "], [
         sparkline(today, Math.max(0, width - 9 - head.length - 3)),
