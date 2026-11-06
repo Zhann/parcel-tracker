@@ -1,0 +1,98 @@
+{
+  "items": [
+    {
+      "itemCode": "323299990000000000000001",
+      "productName": "bpack 24h pro",
+      "senderCommercialName": "Coolblue",
+      "weightInGrams": 17700,
+      "roundName": "Res-318",
+      "expectedDeliveryTimeRange": {
+        "day": "2026-11-06",
+        "time1": "08:00",
+        "time2": "14:00"
+      },
+      "activeStep": {
+        "name": "out_for_delivery",
+        "status": "active",
+        "knownProcessStep": "ON_THE_WAY_TO_YOU",
+        "label": {
+          "main": {
+            "EN": "On the way",
+            "FR": "En route",
+            "NL": "Onderweg",
+            "DE": "Unterwegs"
+          },
+          "detail": {
+            "EN": "to you",
+            "FR": "vers votre adresse",
+            "NL": "naar jou",
+            "DE": "zu Ihrer Adresse"
+          }
+        }
+      },
+      "processOverview": {
+        "textKey": {
+          "EN": {
+            "description": "Shipment being prepared by the postman"
+          },
+          "NL": {
+            "description": "Zending wordt voorbereid door de postbode"
+          }
+        }
+      },
+      "events": [
+        {
+          "date": "2026-11-06",
+          "time": "09:32",
+          "location": {
+            "locationName": "LEDEBERG MAIL"
+          },
+          "key": {
+            "EN": {
+              "description": "Shipment being prepared by the postman"
+            },
+            "NL": {
+              "description": "Zending wordt voorbereid door de postbode"
+            }
+          }
+        },
+        {
+          "date": "2026-11-06",
+          "time": "01:29",
+          "location": {
+            "locationName": "Antwerpen X MANU SORTER "
+          },
+          "key": {
+            "EN": {
+              "description": "Your item has been sorted"
+            },
+            "NL": {
+              "description": "De zending werd gesorteerd"
+            }
+          }
+        },
+        {
+          "date": "2026-11-05",
+          "time": "10:50",
+          "location": {
+            "locationName": "LCI"
+          },
+          "key": {
+            "EN": {
+              "description": "Confirmation of preparation of the shipment received"
+            },
+            "NL": {
+              "description": "Informatie over de zending ontvangen van de afzender"
+            }
+          }
+        }
+      ],
+      "receiver": {
+        "name": "SENTINEL RECEIVER",
+        "street": "SENTINEL STREET 1",
+        "postcode": "9050"
+      },
+      "linkToDeliveryPreferences": "https://example.invalid/?id=SENTINEL-JWT"
+    }
+  ]
+}

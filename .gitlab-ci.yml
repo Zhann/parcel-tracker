@@ -1,0 +1,24 @@
+include:
+  - project: devops/ci-templates
+    file: Templates/Default.gitlab-ci.yml
+  - project: devops/ci-templates
+    file: Jobs/ChangelogNotification.gitlab-ci.yml
+    inputs:
+      slack_icon: ":cloudops-parcel-tracker:"
+      needs: []
+
+# fmt, lint, type-check and the tests, none of which touch the network. The
+# Deno image ships with ENTRYPOINT ["deno"]; clearing it lets GitLab run the
+# script through a shell. Swamp itself is not needed: the behavior's tests
+# drive it through a fake context.
+deno:
+  stage: test
+  image:
+    name: denoland/deno:2.8.3
+    entrypoint: [""]
+  script:
+    - deno task check
+    - deno task test
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == "main"

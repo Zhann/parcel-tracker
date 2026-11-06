@@ -1,0 +1,68 @@
+id: afc70310-2c33-4dad-893d-4f1c9217f93b
+name: follow-parcel
+description: >-
+  Follow one bpost parcel until it is delivered or picked up: look once, so a
+  wrong code or postal code fails at once, then keep looking, paced by where
+  the parcel is. The run lasts as long as the parcel's journey (maxHours at
+  most); the TUI shows it while it runs.
+tags:
+  carrier: bpost
+inputs:
+  properties:
+    code:
+      type: string
+      description: The bpost tracking code.
+    postcode:
+      type: string
+      description: The delivery address's postal code; bpost answers nothing without it.
+    label:
+      type: string
+      default: ""
+      description: A name for the parcel in the TUI. Empty shows the sender.
+    language:
+      type: string
+      enum: [EN, NL, FR, DE]
+      default: EN
+      description: Language of bpost's step and event texts.
+    maxHours:
+      type: number
+      default: 120
+      description: Give up after this many hours.
+  required: [code, postcode]
+jobs:
+  - name: follow
+    description: Look once, then follow until delivered.
+    steps:
+      - name: snapshot
+        description: Look once and write the status; fails on a code bpost does not know.
+        task:
+          type: behavior
+          behaviorType: "@silverfin/bpost-parcel"
+          behaviorName: bpost-${{ inputs.code }}
+          methodName: snapshot
+          globalArgs:
+            itemCode: ${{ inputs.code }}
+            postalCode: ${{ inputs.postcode }}
+            label: ${{ inputs.label }}
+            language: ${{ inputs.language }}
+        dependsOn: []
+      - name: follow
+        description: Keep looking, paced by phase, until delivered, picked up, or maxHours.
+        task:
+          type: behavior
+          behaviorType: "@silverfin/bpost-parcel"
+          behaviorName: bpost-${{ inputs.code }}
+          methodName: follow
+          globalArgs:
+            itemCode: ${{ inputs.code }}
+            postalCode: ${{ inputs.postcode }}
+            label: ${{ inputs.label }}
+            language: ${{ inputs.language }}
+          inputs:
+            maxHours: ${{ inputs.maxHours }}
+        dependsOn:
+          - step: snapshot
+            condition:
+              type: succeeded
+    dependsOn: []
+version: 1
