@@ -1,0 +1,1602 @@
+{
+  "roundName": "Res-318",
+  "day": "2026-11-06",
+  "samples": [
+    {
+      "at": "2026-11-06T09:32:21.400Z",
+      "stops": 43,
+      "progress": 0,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T09:32:51.729Z",
+      "stops": 42,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T09:33:22.030Z",
+      "stops": 42,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T09:33:52.358Z",
+      "stops": 42,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T09:34:22.673Z",
+      "stops": 42,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T09:34:52.980Z",
+      "stops": 42,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T09:35:23.337Z",
+      "stops": 42,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T09:35:53.644Z",
+      "stops": 42,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T09:36:24.046Z",
+      "stops": 42,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T09:36:54.361Z",
+      "stops": 42,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T09:37:24.677Z",
+      "stops": 42,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T09:37:55.088Z",
+      "stops": 42,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T09:38:25.447Z",
+      "stops": 42,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T09:38:55.756Z",
+      "stops": 42,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T09:39:26.103Z",
+      "stops": 42,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T09:39:56.482Z",
+      "stops": 42,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T09:40:26.905Z",
+      "stops": 42,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T09:40:57.282Z",
+      "stops": 42,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T09:41:27.676Z",
+      "stops": 42,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T09:41:58.036Z",
+      "stops": 42,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T09:42:28.401Z",
+      "stops": 42,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T09:42:58.842Z",
+      "stops": 42,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T09:43:29.259Z",
+      "stops": 42,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T09:43:59.576Z",
+      "stops": 41,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T09:44:29.897Z",
+      "stops": 41,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T09:45:00.372Z",
+      "stops": 41,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T09:45:30.779Z",
+      "stops": 40,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T09:46:01.200Z",
+      "stops": 39,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T09:46:31.549Z",
+      "stops": 39,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T09:47:01.917Z",
+      "stops": 39,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T09:47:32.389Z",
+      "stops": 39,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T09:48:02.774Z",
+      "stops": 39,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T09:48:33.084Z",
+      "stops": 39,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T09:49:03.432Z",
+      "stops": 39,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T09:49:33.751Z",
+      "stops": 39,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T09:50:04.098Z",
+      "stops": 39,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T09:50:34.406Z",
+      "stops": 39,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T09:51:04.790Z",
+      "stops": 39,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T09:51:35.100Z",
+      "stops": 38,
+      "progress": 1,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T09:52:05.459Z",
+      "stops": 38,
+      "progress": 1,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T09:52:35.827Z",
+      "stops": 38,
+      "progress": 1,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T09:53:06.163Z",
+      "stops": 37,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T09:53:36.597Z",
+      "stops": 37,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T09:54:07.007Z",
+      "stops": 37,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T09:54:37.370Z",
+      "stops": 37,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T09:55:07.705Z",
+      "stops": 37,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T09:55:38.041Z",
+      "stops": 37,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T09:56:08.385Z",
+      "stops": 37,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T09:56:38.738Z",
+      "stops": 37,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T09:57:09.059Z",
+      "stops": 37,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T09:57:39.445Z",
+      "stops": 37,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T09:58:09.769Z",
+      "stops": 36,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T09:58:40.128Z",
+      "stops": 35,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T09:59:10.508Z",
+      "stops": 35,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T09:59:40.892Z",
+      "stops": 35,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T10:00:11.229Z",
+      "stops": 35,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T10:00:41.536Z",
+      "stops": 35,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T10:01:11.854Z",
+      "stops": 35,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T10:01:42.159Z",
+      "stops": 35,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T10:02:12.529Z",
+      "stops": 34,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T10:02:42.868Z",
+      "stops": 34,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T10:03:13.189Z",
+      "stops": 34,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T10:03:43.526Z",
+      "stops": 34,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T10:04:13.896Z",
+      "stops": 34,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T10:04:44.263Z",
+      "stops": 34,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T10:05:14.624Z",
+      "stops": 34,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T10:05:45.005Z",
+      "stops": 34,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T10:06:15.315Z",
+      "stops": 34,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T10:06:45.785Z",
+      "stops": 34,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T10:07:16.178Z",
+      "stops": 34,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T10:07:46.484Z",
+      "stops": 34,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T10:08:16.818Z",
+      "stops": 34,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T10:08:47.153Z",
+      "stops": 34,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T10:09:17.458Z",
+      "stops": 34,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T10:09:47.870Z",
+      "stops": 33,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:10:18.211Z",
+      "stops": 33,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:10:48.617Z",
+      "stops": 33,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:11:18.967Z",
+      "stops": 33,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:11:49.272Z",
+      "stops": 32,
+      "progress": 1,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:12:19.648Z",
+      "stops": 32,
+      "progress": 1,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:12:50.033Z",
+      "stops": 32,
+      "progress": 1,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:13:20.366Z",
+      "stops": 30,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:13:50.670Z",
+      "stops": 30,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:14:20.967Z",
+      "stops": 29,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:14:51.293Z",
+      "stops": 29,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:15:21.596Z",
+      "stops": 29,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:15:51.891Z",
+      "stops": 29,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:16:22.238Z",
+      "stops": 28,
+      "progress": null,
+      "distanceKm": 0.4
+    },
+    {
+      "at": "2026-11-06T10:16:52.917Z",
+      "stops": 28,
+      "progress": null,
+      "distanceKm": 0.4
+    },
+    {
+      "at": "2026-11-06T10:17:23.293Z",
+      "stops": 28,
+      "progress": null,
+      "distanceKm": 0.4
+    },
+    {
+      "at": "2026-11-06T10:17:53.691Z",
+      "stops": 28,
+      "progress": null,
+      "distanceKm": 0.4
+    },
+    {
+      "at": "2026-11-06T10:18:23.993Z",
+      "stops": 28,
+      "progress": null,
+      "distanceKm": 0.4
+    },
+    {
+      "at": "2026-11-06T10:18:54.403Z",
+      "stops": 28,
+      "progress": null,
+      "distanceKm": 0.4
+    },
+    {
+      "at": "2026-11-06T10:19:24.838Z",
+      "stops": 28,
+      "progress": null,
+      "distanceKm": 0.4
+    },
+    {
+      "at": "2026-11-06T10:19:55.152Z",
+      "stops": 28,
+      "progress": null,
+      "distanceKm": 0.4
+    },
+    {
+      "at": "2026-11-06T10:20:25.470Z",
+      "stops": 28,
+      "progress": null,
+      "distanceKm": 0.4
+    },
+    {
+      "at": "2026-11-06T10:20:55.880Z",
+      "stops": 28,
+      "progress": null,
+      "distanceKm": 0.4
+    },
+    {
+      "at": "2026-11-06T10:21:26.189Z",
+      "stops": 27,
+      "progress": 1,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:21:56.561Z",
+      "stops": 27,
+      "progress": 1,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:22:26.874Z",
+      "stops": 27,
+      "progress": 1,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:22:57.308Z",
+      "stops": 27,
+      "progress": 1,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:23:27.821Z",
+      "stops": 27,
+      "progress": 1,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:23:58.187Z",
+      "stops": 27,
+      "progress": 1,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:24:28.481Z",
+      "stops": 27,
+      "progress": 1,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:24:58.797Z",
+      "stops": 27,
+      "progress": 1,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:25:29.128Z",
+      "stops": 27,
+      "progress": 1,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:25:59.473Z",
+      "stops": 27,
+      "progress": 1,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:26:29.847Z",
+      "stops": 27,
+      "progress": 1,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:27:00.190Z",
+      "stops": 27,
+      "progress": 1,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:27:30.497Z",
+      "stops": 27,
+      "progress": 1,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:28:00.874Z",
+      "stops": 27,
+      "progress": 1,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:28:31.225Z",
+      "stops": 27,
+      "progress": 1,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:29:01.547Z",
+      "stops": 27,
+      "progress": 1,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:29:31.902Z",
+      "stops": 27,
+      "progress": 1,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:30:02.240Z",
+      "stops": 27,
+      "progress": 1,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:30:32.655Z",
+      "stops": 27,
+      "progress": 1,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:31:03.107Z",
+      "stops": 27,
+      "progress": 1,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:31:33.420Z",
+      "stops": 27,
+      "progress": 1,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:32:03.720Z",
+      "stops": 27,
+      "progress": 1,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:32:34.131Z",
+      "stops": 27,
+      "progress": 1,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:33:04.590Z",
+      "stops": 27,
+      "progress": 1,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:33:34.962Z",
+      "stops": 27,
+      "progress": 1,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:34:05.362Z",
+      "stops": 27,
+      "progress": 1,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:34:35.681Z",
+      "stops": 27,
+      "progress": 1,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:35:05.994Z",
+      "stops": 27,
+      "progress": 1,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:35:36.383Z",
+      "stops": 27,
+      "progress": 1,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:36:06.714Z",
+      "stops": 27,
+      "progress": 1,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:36:37.150Z",
+      "stops": 27,
+      "progress": 1,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:37:07.476Z",
+      "stops": 27,
+      "progress": 1,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:37:37.937Z",
+      "stops": 27,
+      "progress": 1,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:38:08.278Z",
+      "stops": 26,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:38:38.707Z",
+      "stops": 26,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:39:09.090Z",
+      "stops": 26,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:39:39.458Z",
+      "stops": 25,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:40:09.746Z",
+      "stops": 24,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:40:40.084Z",
+      "stops": 24,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:41:10.431Z",
+      "stops": 24,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:41:40.744Z",
+      "stops": 23,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:42:11.166Z",
+      "stops": 23,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:42:41.470Z",
+      "stops": 23,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:43:11.877Z",
+      "stops": 23,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:43:42.336Z",
+      "stops": 23,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:44:12.747Z",
+      "stops": 23,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:44:43.095Z",
+      "stops": 23,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:45:13.579Z",
+      "stops": 23,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:45:43.932Z",
+      "stops": 22,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:46:14.257Z",
+      "stops": 22,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:46:44.664Z",
+      "stops": 22,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:47:15.062Z",
+      "stops": 22,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:47:45.374Z",
+      "stops": 22,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:48:15.760Z",
+      "stops": 22,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:48:46.159Z",
+      "stops": 22,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:49:16.561Z",
+      "stops": 22,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:49:46.996Z",
+      "stops": 22,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:50:17.395Z",
+      "stops": 22,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:50:47.816Z",
+      "stops": 22,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:51:18.163Z",
+      "stops": 22,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:51:48.602Z",
+      "stops": 21,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:52:18.892Z",
+      "stops": 21,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:52:49.266Z",
+      "stops": 21,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:53:19.609Z",
+      "stops": 21,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:53:49.924Z",
+      "stops": 21,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:54:20.246Z",
+      "stops": 21,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:54:50.582Z",
+      "stops": 20,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:55:20.982Z",
+      "stops": 20,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:55:51.326Z",
+      "stops": 19,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:56:21.638Z",
+      "stops": 19,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:56:51.962Z",
+      "stops": 19,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:57:22.331Z",
+      "stops": 19,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:57:52.628Z",
+      "stops": 19,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:58:22.990Z",
+      "stops": 19,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:58:53.284Z",
+      "stops": 19,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:59:23.585Z",
+      "stops": 19,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T10:59:53.893Z",
+      "stops": 16,
+      "progress": null,
+      "distanceKm": 0.4
+    },
+    {
+      "at": "2026-11-06T11:00:24.286Z",
+      "stops": 16,
+      "progress": null,
+      "distanceKm": 0.4
+    },
+    {
+      "at": "2026-11-06T11:00:54.578Z",
+      "stops": 16,
+      "progress": null,
+      "distanceKm": 0.4
+    },
+    {
+      "at": "2026-11-06T11:01:24.973Z",
+      "stops": 16,
+      "progress": null,
+      "distanceKm": 0.4
+    },
+    {
+      "at": "2026-11-06T11:01:55.338Z",
+      "stops": 16,
+      "progress": null,
+      "distanceKm": 0.4
+    },
+    {
+      "at": "2026-11-06T11:02:25.709Z",
+      "stops": 16,
+      "progress": null,
+      "distanceKm": 0.4
+    },
+    {
+      "at": "2026-11-06T11:02:56.083Z",
+      "stops": 16,
+      "progress": null,
+      "distanceKm": 0.4
+    },
+    {
+      "at": "2026-11-06T11:03:26.472Z",
+      "stops": 16,
+      "progress": null,
+      "distanceKm": 0.4
+    },
+    {
+      "at": "2026-11-06T11:03:56.792Z",
+      "stops": 16,
+      "progress": null,
+      "distanceKm": 0.4
+    },
+    {
+      "at": "2026-11-06T11:04:27.175Z",
+      "stops": 16,
+      "progress": null,
+      "distanceKm": 0.4
+    },
+    {
+      "at": "2026-11-06T11:04:57.580Z",
+      "stops": 16,
+      "progress": null,
+      "distanceKm": 0.4
+    },
+    {
+      "at": "2026-11-06T11:05:28.010Z",
+      "stops": 16,
+      "progress": null,
+      "distanceKm": 0.4
+    },
+    {
+      "at": "2026-11-06T11:05:58.409Z",
+      "stops": 16,
+      "progress": null,
+      "distanceKm": 0.4
+    },
+    {
+      "at": "2026-11-06T11:06:28.734Z",
+      "stops": 16,
+      "progress": null,
+      "distanceKm": 0.4
+    },
+    {
+      "at": "2026-11-06T11:06:59.048Z",
+      "stops": 16,
+      "progress": null,
+      "distanceKm": 0.4
+    },
+    {
+      "at": "2026-11-06T11:07:29.446Z",
+      "stops": 16,
+      "progress": null,
+      "distanceKm": 0.4
+    },
+    {
+      "at": "2026-11-06T11:07:59.745Z",
+      "stops": 16,
+      "progress": null,
+      "distanceKm": 0.4
+    },
+    {
+      "at": "2026-11-06T11:08:30.086Z",
+      "stops": 16,
+      "progress": null,
+      "distanceKm": 0.4
+    },
+    {
+      "at": "2026-11-06T11:09:00.435Z",
+      "stops": 15,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T11:09:30.809Z",
+      "stops": 15,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T11:10:01.221Z",
+      "stops": 15,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T11:10:31.593Z",
+      "stops": 15,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T11:11:01.964Z",
+      "stops": 15,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T11:11:32.357Z",
+      "stops": 14,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T11:12:02.791Z",
+      "stops": 14,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T11:12:33.134Z",
+      "stops": 14,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T11:13:03.503Z",
+      "stops": 14,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T11:13:33.800Z",
+      "stops": 13,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T11:14:04.105Z",
+      "stops": 12,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T11:14:34.409Z",
+      "stops": 12,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T11:15:04.838Z",
+      "stops": 11,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T11:15:35.148Z",
+      "stops": 11,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T11:16:05.508Z",
+      "stops": 11,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T11:16:35.917Z",
+      "stops": 11,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T11:17:06.286Z",
+      "stops": 11,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T11:17:36.650Z",
+      "stops": 11,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T11:18:07.059Z",
+      "stops": 11,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T11:18:37.479Z",
+      "stops": 11,
+      "progress": null,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T11:19:07.893Z",
+      "stops": 10,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T11:19:38.192Z",
+      "stops": 10,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T11:20:08.579Z",
+      "stops": 10,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T11:20:38.912Z",
+      "stops": 10,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T11:21:09.239Z",
+      "stops": 10,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T11:21:39.570Z",
+      "stops": 10,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T11:22:09.982Z",
+      "stops": 9,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T11:22:40.269Z",
+      "stops": 9,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T11:23:10.635Z",
+      "stops": 9,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T11:23:40.977Z",
+      "stops": 9,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T11:24:11.303Z",
+      "stops": 9,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T11:24:41.714Z",
+      "stops": 9,
+      "progress": null,
+      "distanceKm": 0.6
+    },
+    {
+      "at": "2026-11-06T11:25:12.059Z",
+      "stops": 8,
+      "progress": 1,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T11:25:42.432Z",
+      "stops": 8,
+      "progress": 1,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T11:26:12.731Z",
+      "stops": 8,
+      "progress": 1,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T11:26:43.066Z",
+      "stops": 8,
+      "progress": 1,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T11:27:13.471Z",
+      "stops": 6,
+      "progress": 1,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T11:27:43.818Z",
+      "stops": 6,
+      "progress": 1,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T11:28:14.136Z",
+      "stops": 6,
+      "progress": 1,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T11:28:44.446Z",
+      "stops": 6,
+      "progress": 1,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T11:29:14.791Z",
+      "stops": 6,
+      "progress": 1,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T11:29:45.187Z",
+      "stops": 6,
+      "progress": 1,
+      "distanceKm": 0.5
+    },
+    {
+      "at": "2026-11-06T11:30:15.521Z",
+      "stops": 4,
+      "progress": 0.020631548311990686,
+      "distanceKm": 0.4
+    },
+    {
+      "at": "2026-11-06T11:30:45.889Z",
+      "stops": 4,
+      "progress": 0.020631548311990686,
+      "distanceKm": 0.4
+    },
+    {
+      "at": "2026-11-06T11:31:16.255Z",
+      "stops": 4,
+      "progress": 0.020631548311990686,
+      "distanceKm": 0.4
+    },
+    {
+      "at": "2026-11-06T11:31:46.631Z",
+      "stops": 4,
+      "progress": 0.020631548311990686,
+      "distanceKm": 0.4
+    },
+    {
+      "at": "2026-11-06T11:32:17.009Z",
+      "stops": 4,
+      "progress": 0.020631548311990686,
+      "distanceKm": 0.4
+    },
+    {
+      "at": "2026-11-06T11:32:47.358Z",
+      "stops": 4,
+      "progress": 0.020631548311990686,
+      "distanceKm": 0.4
+    },
+    {
+      "at": "2026-11-06T11:33:17.649Z",
+      "stops": 4,
+      "progress": 0.020631548311990686,
+      "distanceKm": 0.4
+    },
+    {
+      "at": "2026-11-06T11:33:47.952Z",
+      "stops": 4,
+      "progress": 0.020631548311990686,
+      "distanceKm": 0.4
+    },
+    {
+      "at": "2026-11-06T11:34:18.292Z",
+      "stops": 4,
+      "progress": 0.020631548311990686,
+      "distanceKm": 0.4
+    },
+    {
+      "at": "2026-11-06T11:34:48.941Z",
+      "stops": 4,
+      "progress": 0.020631548311990686,
+      "distanceKm": 0.4
+    },
+    {
+      "at": "2026-11-06T11:35:19.323Z",
+      "stops": 4,
+      "progress": 0.020631548311990686,
+      "distanceKm": 0.4
+    },
+    {
+      "at": "2026-11-06T11:35:49.676Z",
+      "stops": 4,
+      "progress": 0.020631548311990686,
+      "distanceKm": 0.4
+    },
+    {
+      "at": "2026-11-06T11:36:19.989Z",
+      "stops": 4,
+      "progress": 0.020631548311990686,
+      "distanceKm": 0.4
+    },
+    {
+      "at": "2026-11-06T11:36:50.298Z",
+      "stops": 4,
+      "progress": 0.020631548311990686,
+      "distanceKm": 0.4
+    },
+    {
+      "at": "2026-11-06T11:37:20.652Z",
+      "stops": 4,
+      "progress": 0.020631548311990686,
+      "distanceKm": 0.4
+    },
+    {
+      "at": "2026-11-06T11:37:51.051Z",
+      "stops": 4,
+      "progress": 0.020631548311990686,
+      "distanceKm": 0.4
+    },
+    {
+      "at": "2026-11-06T11:38:21.460Z",
+      "stops": 4,
+      "progress": 0.020631548311990686,
+      "distanceKm": 0.4
+    },
+    {
+      "at": "2026-11-06T11:38:51.864Z",
+      "stops": 4,
+      "progress": 0.020631548311990686,
+      "distanceKm": 0.4
+    },
+    {
+      "at": "2026-11-06T11:39:22.181Z",
+      "stops": 4,
+      "progress": 0.020631548311990686,
+      "distanceKm": 0.4
+    },
+    {
+      "at": "2026-11-06T11:39:52.492Z",
+      "stops": 4,
+      "progress": 0.020631548311990686,
+      "distanceKm": 0.4
+    },
+    {
+      "at": "2026-11-06T11:40:22.847Z",
+      "stops": 4,
+      "progress": 0.020631548311990686,
+      "distanceKm": 0.4
+    },
+    {
+      "at": "2026-11-06T11:40:53.349Z",
+      "stops": 4,
+      "progress": 0.020631548311990686,
+      "distanceKm": 0.4
+    },
+    {
+      "at": "2026-11-06T11:41:23.691Z",
+      "stops": 4,
+      "progress": 0.020631548311990686,
+      "distanceKm": 0.4
+    },
+    {
+      "at": "2026-11-06T11:41:53.994Z",
+      "stops": 4,
+      "progress": 0.020631548311990686,
+      "distanceKm": 0.4
+    },
+    {
+      "at": "2026-11-06T11:42:24.318Z",
+      "stops": 4,
+      "progress": 0.020631548311990686,
+      "distanceKm": 0.4
+    },
+    {
+      "at": "2026-11-06T11:42:54.699Z",
+      "stops": 4,
+      "progress": 0.020631548311990686,
+      "distanceKm": 0.4
+    },
+    {
+      "at": "2026-11-06T11:43:25.034Z",
+      "stops": 4,
+      "progress": 0.020631548311990686,
+      "distanceKm": 0.4
+    },
+    {
+      "at": "2026-11-06T11:43:55.477Z",
+      "stops": 3,
+      "progress": 0.021672158154859966,
+      "distanceKm": 0.1
+    },
+    {
+      "at": "2026-11-06T11:44:25.799Z",
+      "stops": 3,
+      "progress": 0.021672158154859966,
+      "distanceKm": 0.1
+    },
+    {
+      "at": "2026-11-06T11:44:56.154Z",
+      "stops": 3,
+      "progress": 0.021672158154859966,
+      "distanceKm": 0.1
+    },
+    {
+      "at": "2026-11-06T11:45:26.590Z",
+      "stops": 3,
+      "progress": 0.021672158154859966,
+      "distanceKm": 0.1
+    },
+    {
+      "at": "2026-11-06T11:45:56.989Z",
+      "stops": 3,
+      "progress": 0.021672158154859966,
+      "distanceKm": 0.1
+    },
+    {
+      "at": "2026-11-06T11:46:27.403Z",
+      "stops": 3,
+      "progress": 0.021672158154859966,
+      "distanceKm": 0.1
+    }
+  ]
+}

@@ -100,3 +100,29 @@ Deno.test("estimate anchors at the last drop and never says the past", () => {
   assertEquals(lateEta.earliest, late.toISOString());
   assertEquals(lateEta.latest, late.toISOString());
 });
+
+/** Round Res-318 on 2026-11-06, as `follow` recorded it: 266 looks, 43 stops down to 3. */
+const RES_318: { samples: RoundSample[] } = JSON.parse(
+  Deno.readTextFileSync(new URL("../fixtures/round_res-318_2026-11-06.json", import.meta.url)),
+);
+
+Deno.test("a real round's drops are measured, multi-stop drops once", () => {
+  const s = RES_318.samples;
+  assertEquals(s.length, 266);
+  assertEquals(dropCount(s), 34);
+  assertEquals(stopDurations(s).length, 39);
+});
+
+Deno.test("a real round's ETA brackets when its count actually got there", () => {
+  const s = RES_318.samples;
+  const last = s[s.length - 1].stops;
+  const reached = Date.parse(s.find((x) => x.stops <= last)!.at);
+  for (const cut of [30, 20, 10]) {
+    const i = s.findIndex((x) => x.stops <= cut);
+    const eta = estimate(s.slice(0, i + 1), [], new Date(s[i].at))!;
+    assertEquals(eta.basis, "live");
+    const at = (p: number) => Date.parse(eta.anchor) + (eta.stops - last) * p * 1000;
+    const msg = `cut at ${cut} stops`;
+    assertEquals(at(eta.pace.p25) <= reached && reached <= at(eta.pace.p75), true, msg);
+  }
+});
