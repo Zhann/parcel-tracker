@@ -343,7 +343,8 @@ These come from the page's own static JS bundle, not from the API:
   - Keep the allow-list, and never add a signature fetch.
   - Say in the README that it is unofficial, not affiliated with bpost, and
     for tracking your own parcels.
-  - Consider an identifying `User-Agent`.
+  - Consider an identifying `User-Agent`. (Done in 2026.11.08.2: the
+    client name, version and repository URL, and `Retry-After` is honoured.)
   - Better still, ask bpost first.
 
 ### 4. Company or commercial use

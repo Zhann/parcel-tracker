@@ -1,9 +1,11 @@
 import { assert, assertEquals, assertRejects, assertThrows } from "jsr:@std/assert@1.0.13";
 import {
   haversineKm,
+  HttpError,
   nextCheckSeconds,
   ParcelNotFound,
   parseItems,
+  parseRetryAfter,
   parseRound,
   phaseOf,
   trackParcel,
@@ -135,4 +137,27 @@ Deno.test("trackParcel asks for the round only when out for delivery", async () 
 Deno.test("trackParcel surfaces an HTTP error", async () => {
   const fn = () => Promise.resolve(new Response("nope", { status: 503 }));
   await assertRejects(() => trackParcel("x", "9050", "EN", fn), Error, "HTTP 503");
+});
+
+Deno.test("trackParcel passes on bpost's Retry-After", async () => {
+  const fn = () =>
+    Promise.resolve(new Response("busy", { status: 429, headers: { "retry-after": "120" } }));
+  const err = await assertRejects(() => trackParcel("x", "9050", "EN", fn), HttpError);
+  assertEquals(err.status, 429);
+  assertEquals(err.retryAfterSeconds, 120);
+
+  const plain = () => Promise.resolve(new Response("down", { status: 502 }));
+  const err2 = await assertRejects(() => trackParcel("x", "9050", "EN", plain), HttpError);
+  assertEquals(err2.retryAfterSeconds, null);
+});
+
+Deno.test("parseRetryAfter reads seconds and HTTP dates", () => {
+  const now = new Date("2026-11-08T10:00:00Z");
+  assertEquals(parseRetryAfter("90", now), 90);
+  assertEquals(parseRetryAfter(" 0 ", now), 0);
+  assertEquals(parseRetryAfter("Sun, 08 Nov 2026 10:02:00 GMT", now), 120);
+  assertEquals(parseRetryAfter("Sun, 08 Nov 2026 09:00:00 GMT", now), 0);
+  assertEquals(parseRetryAfter("soon", now), null);
+  assertEquals(parseRetryAfter("-5", now), null);
+  assertEquals(parseRetryAfter(null, now), null);
 });

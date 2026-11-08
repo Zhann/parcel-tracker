@@ -9,6 +9,9 @@ import {
   MAX_FAILURES,
   type MethodContext,
   model,
+  REPOSITORY_URL,
+  requestHeaders,
+  RETRY_SECONDS,
   type Round,
   type Status,
 } from "./bpost_parcel.ts";
@@ -30,8 +33,11 @@ const DELIVERED = items({ name: "delivered", knownProcessStep: "DELIVERED_AT_HOM
 const NO_ROUND = { error: "No round status info can be rendered" };
 const stops = (n: number) => ({ itemOnRoundStatus: { nrOfStopsUntilTarget: [String(n)] } });
 
-/** One scripted look: the items answer and, when asked, the round answer. */
-type Look = [unknown, unknown?] | "fail";
+/**
+ * One scripted look: the items answer and, when asked, the round answer;
+ * "fail" is a bare 502, "busy" a 429 asking to come back in 5 minutes.
+ */
+type Look = [unknown, unknown?] | "fail" | "busy";
 
 function fakeWorld(script: Look[], start = "2026-11-06T09:00:00Z") {
   let clock = Date.parse(start);
@@ -49,6 +55,11 @@ function fakeWorld(script: Look[], start = "2026-11-06T09:00:00Z") {
       const endpoint = new URL(url).pathname.split("/").pop();
       if (endpoint === "items") current = script[Math.min(i++, script.length - 1)];
       if (current === "fail") return Promise.resolve(new Response("down", { status: 502 }));
+      if (current === "busy") {
+        return Promise.resolve(
+          new Response("slow down", { status: 429, headers: { "retry-after": "300" } }),
+        );
+      }
       const body = endpoint === "items" ? current[0] : current[1] ?? NO_ROUND;
       return Promise.resolve(Response.json(body));
     },
@@ -177,6 +188,27 @@ Deno.test("a failed look shows its error until the next good look", async () => 
   assertEquals(failed.following, true);
   assertEquals(Date.parse(failed.nextCheckAt!) - Date.parse(first.checkedAt), 120_000);
   assertEquals(delivered.error, null);
+});
+
+Deno.test("follow stays away as long as bpost's Retry-After asks", async () => {
+  const { ctx, store } = fakeContext();
+  const { deps, sleeps } = fakeWorld([[OUT, NO_ROUND], "busy", "fail", [DELIVERED]]);
+  await follow(ctx, deps, 120);
+  assertEquals(sleeps, [60, 300, RETRY_SECONDS]);
+
+  const busy = (store.get("status") as Status[])[1];
+  assertEquals(busy.error, "bpost answered HTTP 429 for /track/items");
+  assertEquals(Date.parse(busy.nextCheckAt!) - Date.parse(busy.checkedAt), 60_000 + 300_000);
+});
+
+Deno.test("requests name the client and its version, and nothing about the user", () => {
+  const headers = requestHeaders();
+  assertEquals(
+    headers["user-agent"],
+    `parcel-tracker/${model.version} (+${REPOSITORY_URL})`,
+  );
+  assert(!headers["user-agent"].includes("@"));
+  assertEquals(headers["accept"], "application/json");
 });
 
 Deno.test("follow stops at an unknown parcel", async () => {

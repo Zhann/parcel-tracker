@@ -23,7 +23,9 @@ swamp workflow run @zhann/follow-parcel \
 
 The run lasts as long as the parcel's journey (`maxHours`, 120 by default). It looks every 15
 minutes in transit, every minute once the parcel is out for delivery, every 30 seconds while the
-round is live (the rate bpost's page uses), and hourly while the parcel waits at a pickup point.
+round is live (the rate bpost's page uses), and hourly while the parcel waits at a pickup point. A
+failed look is tried again a minute later, or later still if bpost answers with `Retry-After`. Every
+request says who is asking: `parcel-tracker/<version> (+https://github.com/zhann/parcel-tracker)`.
 
 ## Where is it now?
 

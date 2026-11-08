@@ -21,6 +21,7 @@
 import { z } from "npm:zod@4";
 import {
   type FetchFn,
+  HttpError,
   type Language,
   nextCheckSeconds,
   ParcelNotFound,
@@ -151,11 +152,26 @@ export interface Deps {
 /** A look that hangs this long fails, and is retried like any other failure. */
 const FETCH_TIMEOUT_MS = 30_000;
 
+/** Where the code lives, so bpost can see who is asking and how to reach them. */
+export const REPOSITORY_URL = "https://github.com/zhann/parcel-tracker";
+
+/**
+ * Headers on every request to bpost. The User-Agent names this client and its
+ * version and links the repository, as docs/research/bpost-tos.md recommends.
+ * It carries nothing about whoever runs it.
+ */
+export function requestHeaders(): Record<string, string> {
+  return {
+    "accept": "application/json",
+    "user-agent": `parcel-tracker/${model.version} (+${REPOSITORY_URL})`,
+  };
+}
+
 /** The real network, clock and an abortable sleep. */
 export const realDeps: Deps = {
   fetch: (url) =>
     fetch(url, {
-      headers: { "accept": "application/json" },
+      headers: requestHeaders(),
       signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
     }),
   now: () => new Date(),
@@ -283,10 +299,14 @@ export async function checkOnce(
 /** Consecutive failed looks after which `follow` gives up. */
 export const MAX_FAILURES = 30;
 
+/** Seconds before a failed look is tried again, unless bpost asks for longer. */
+export const RETRY_SECONDS = 60;
+
 /**
  * Look, wait, look again until the parcel is done or the deadline passes.
- * A transient failure (network, bpost 5xx) is logged, shown as the status's
- * `error` and retried a minute later; the next good look clears it. A parcel
+ * A transient failure (network, bpost 5xx or 429) is logged, shown as the
+ * status's `error` and retried a minute later, or after bpost's `Retry-After`
+ * when that is longer; the next good look clears it. A parcel
  * bpost no longer knows, or {@link MAX_FAILURES} failures in a row, end the
  * follow with the error on a status that is no longer following.
  */
@@ -323,18 +343,23 @@ export async function follow(
       if (ctx.signal?.aborted) throw err;
       const error = err instanceof Error ? err.message : String(err);
       const fatal = err instanceof ParcelNotFound || ++failures >= MAX_FAILURES;
-      ctx.logger.warn("look {n} failed: {error}", { n: failures, error });
+      const retryAfter = err instanceof HttpError ? err.retryAfterSeconds : null;
+      waitSeconds = Math.max(RETRY_SECONDS, retryAfter ?? 0);
+      ctx.logger.warn("look {n} failed: {error}; trying again in {wait} s", {
+        n: failures,
+        error,
+        wait: waitSeconds,
+      });
       last ??= await ctx.readResource(STATUS) as Status | null;
       if (last) {
         last = fatal ? { ...last, error, following: false, nextCheckAt: null } : {
           ...last,
           error,
-          nextCheckAt: new Date(deps.now().getTime() + 60_000).toISOString(),
+          nextCheckAt: new Date(deps.now().getTime() + waitSeconds * 1000).toISOString(),
         };
         handle = await ctx.writeResource("status", STATUS, last);
       }
       if (fatal) throw err;
-      waitSeconds = 60;
     }
 
     if (waitSeconds == null) break;
@@ -366,7 +391,7 @@ async function setArchived(ctx: MethodContext, archived: boolean) {
  */
 export const model = {
   type: "@zhann/bpost-parcel",
-  version: "2026.11.08.1",
+  version: "2026.11.08.2",
   upgrades: [
     {
       toVersion: "2026.11.06.2",
@@ -386,6 +411,12 @@ export const model = {
     {
       toVersion: "2026.11.08.1",
       description: "Links the public repository and says it is unofficial; arguments unchanged.",
+      upgradeAttributes: (old: Record<string, unknown>) => old,
+    },
+    {
+      toVersion: "2026.11.08.2",
+      description:
+        "Sends an identifying User-Agent and honours bpost's Retry-After; arguments unchanged.",
       upgradeAttributes: (old: Record<string, unknown>) => old,
     },
   ],
