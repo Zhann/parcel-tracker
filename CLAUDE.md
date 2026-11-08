@@ -1,11 +1,14 @@
 # Parcel tracker
 
-Swamp workflow that follows a bpost parcel to the doorstep, with a terminal view of its stops left and ETA. The datastore stays local, so nobody's parcels reach the team's bucket.
+Swamp workflow that follows a bpost parcel to the doorstep, with a terminal view of its stops left and ETA. The datastore stays local, so parcel data never leaves this machine.
 
-Issues live in devops/cloud-infra, not here:
-<https://gitlab.silverfin.com/devops/cloud-infra/-/issues>. Branches are named
-`<issue-id>-short-description`, and an MR starts with `Closes` or `ref:`
-followed by the issue's full URL.
+Hosted on GitHub at <https://github.com/zhann/parcel-tracker>; issues and pull
+requests live there, and `gh` works against it. Branches are named
+`<issue-number>-short-description` (no issue: a short description), and work
+lands on `main` through a pull request whose body starts with `Closes #<n>` or
+`Ref #<n>`. Keep history linear: rebase, don't merge. CI
+(`.github/workflows/ci.yml`) runs `deno task check` and `deno task test` on every
+pull request and on `main`.
 
 ## Layout
 

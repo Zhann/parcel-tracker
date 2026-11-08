@@ -1,6 +1,6 @@
 # Parcel tracker
 
-Swamp workflow that follows a bpost parcel to the doorstep, with a terminal view of its stops left and ETA. The datastore stays local, so nobody's parcels reach the team's bucket.
+Swamp workflow that follows a bpost parcel to the doorstep, with a terminal view of its stops left and ETA. The datastore stays local, so parcel data never leaves this machine.
 
 ```text
  Parcels                                                                   11:30

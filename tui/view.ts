@@ -1,10 +1,9 @@
 /**
  * Rendering, kept pure: state and a clock in, lines of styled text out.
  *
- * Status follows the CloudOps language (cloud-infra `docs/brand/status.md`):
- * a glyph names the state, a word follows it, the colour agrees and never
- * carries it alone. The tints are the dark-theme ones from
- * `docs/brand/palette.md`; the vest's orange is not used.
+ * A glyph names each state, a word follows it, and the colour agrees but never
+ * carries it alone. The tints are picked for a dark terminal, and none of them
+ * is orange.
  *
  * @module
  */
