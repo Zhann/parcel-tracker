@@ -7,6 +7,9 @@ It reads the two public endpoints bpost's own tracking page uses, needs no accou
 never writes the receiver's name, street or coordinates: the parse copies out an allow-list and
 turns the van's position into a distance.
 
+Unofficial: not made by, endorsed by or affiliated with bpost. It is meant for following your own
+parcels, at the same pace bpost's own tracking page looks.
+
 ## Follow a parcel
 
 The `@zhann/follow-parcel` workflow looks once, so a wrong code or postal code fails straight away,

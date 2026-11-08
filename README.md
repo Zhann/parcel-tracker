@@ -4,6 +4,9 @@
 
 Swamp workflow that follows a bpost parcel to the doorstep, with a terminal view of its stops left and ETA. The datastore stays local, so parcel data never leaves this machine.
 
+Unofficial: not made by, endorsed by or affiliated with bpost. It is meant for following your own
+parcels, at the same pace bpost's own tracking page looks.
+
 ```text
  Parcels                                                                   11:30
 ▸ Coolblue           ● 12 stops │ Coolblue  bpack 24h pro · 17.7 kg
