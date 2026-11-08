@@ -1,3 +1,5 @@
+<p align="center"><img src="docs/img/logo.png" width="180" alt="A pixel-art parcel on a dotted route to a house"></p>
+
 # Parcel tracker
 
 Swamp workflow that follows a bpost parcel to the doorstep, with a terminal view of its stops left and ETA. The datastore stays local, so parcel data never leaves this machine.
