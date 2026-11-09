@@ -22,6 +22,26 @@ export function carrierOf(s: { carrier?: Carrier }): Carrier {
   return s.carrier ?? "bpost";
 }
 
+/** The phases a parcel goes through, whoever carries it. */
+export const PHASES = [
+  "in_transit",
+  "out_for_delivery",
+  "at_pickup_point",
+  "returning",
+  "done",
+] as const;
+
+/**
+ * Where the parcel is, in the terms the follow loop paces itself by.
+ *
+ * - `in_transit`: announced, sorted, in the network.
+ * - `out_for_delivery`: with the postman or courier today (for bpost, live once stops show).
+ * - `at_pickup_point`: waiting in a post point, locker, parcel shop or office.
+ * - `returning`: on its way back to the sender.
+ * - `done`: delivered, picked up, or back at the sender.
+ */
+export type Phase = typeof PHASES[number];
+
 /** One timeline event. */
 export const EventSchema = z.object({
   at: z.string(),
@@ -62,7 +82,7 @@ export const StatusSchema = z.object({
   product: z.string().nullable(),
   sender: z.string().nullable(),
   weightGrams: z.number().nullable(),
-  phase: z.enum(["in_transit", "out_for_delivery", "at_pickup_point", "returning", "done"]),
+  phase: z.enum(PHASES),
   step: z.object({
     name: z.string().nullable(),
     knownProcessStep: z.string().nullable(),
