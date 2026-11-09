@@ -1,6 +1,6 @@
 manifestVersion: 1
 name: "@zhann/bpost-parcel"
-version: "2026.11.08.2"
+version: "2026.11.09.1"
 license: MIT
 repository: "https://github.com/zhann/parcel-tracker"
 description: "A bpost parcel followed from announcement to the doorstep: status, round stops, pace and ETA."
@@ -11,10 +11,10 @@ labels:
 
 models:
   - bpost_parcel.ts
-reports:
-  - parcel_report.ts
 workflows:
   - workflow-follow-parcel.yaml
+dependencies:
+  - "@zhann/parcel-report"
 additionalFiles:
   - README.md
   - LICENSE
