@@ -8,9 +8,16 @@
  * `@zhann/follow-dhl-parcel` workflow runs the two.
  *
  * DHL's API needs a key (free at developer.dhl.com) and gives a new one 250
- * calls a day; the pacing keeps one shipment under 100. The ETA is DHL's own:
- * there is no postman's round to count stops on, so the `status` resource's
- * `round` and `eta` stay null, and its `window` holds DHL's estimate.
+ * calls a day, for every shipment followed with it together. Each look, a
+ * `snapshot`'s and a retry's too, is counted in the `calls` resource; before
+ * a look, every DHL behavior's count for the Brussels day is added up. A
+ * follow stretches its pace to share the calls left with the other running
+ * follows, and with the `dailyBudget` spent it waits for the new day, its
+ * status saying so (see `_lib/quota.ts` for what this does not cover).
+ *
+ * The ETA is DHL's own: there is no postman's round to count stops on, so
+ * the `status` resource's `round` and `eta` stay null, and its `window`
+ * holds DHL's estimate.
  *
  * Nothing about the receiver is written (see `_lib/dhl.ts`), and DHL's terms
  * ask for tracking data to go 30 days after delivery: the `status` resource
@@ -27,6 +34,17 @@ import {
   ParcelNotFound,
   trackShipment,
 } from "./_lib/dhl.ts";
+import {
+  type Calls,
+  callsToday,
+  countCall,
+  DEFAULT_DAILY_BUDGET,
+  isSpent,
+  pacedSeconds,
+  type Quota,
+  secondsUntilTomorrow,
+  TOMORROW_MARGIN_SECONDS,
+} from "./_lib/quota.ts";
 import { type Status, StatusSchema } from "./_lib/status.ts";
 
 /**
@@ -55,6 +73,9 @@ const GlobalArgsSchema = z.object({
   language: z.enum(["EN", "NL", "FR", "DE"]).default("EN").describe(
     "Language of DHL's texts. Out for delivery and pickup points are only recognised in English.",
   ),
+  dailyBudget: z.number().int().positive().default(DEFAULT_DAILY_BUDGET).describe(
+    "Calls a day the key allows, shared by every shipment followed with it. A new key has 250.",
+  ),
 });
 
 /** The parsed global arguments of one shipment. */
@@ -64,6 +85,10 @@ export type { Status };
 
 /** The slice of swamp's method context this behavior uses. */
 export interface MethodContext {
+  /** This behavior's id, to tell its own data from the other shipments'. */
+  modelId: string;
+  /** The latest data of every behavior that matches a `swamp data query` predicate. */
+  queryData: (predicate: string) => Promise<{ modelId: string; attributes: unknown }[]>;
   globalArgs: GlobalArgs;
   signal?: AbortSignal;
   logger: {
@@ -155,14 +180,65 @@ export function realDeps(apiKey: string): Deps {
 }
 
 const STATUS = "status";
+const CALLS = "calls";
 
-/** Look once and write the status. Returns it, for the follow loop to pace by. */
+/** What a status says while its follow waits for the new day's calls. */
+export const WAITING_FOR_QUOTA = "waiting for tomorrow's DHL quota";
+
+/** A follow whose next look is this late has stopped, and takes no share of the calls left. */
+const FOLLOW_GRACE_MS = 10 * 60_000;
+
+/** Today's calls are spent: nothing was asked of DHL. Not a failure; the new day brings more. */
+export class QuotaSpent extends Error {
+  constructor(budget: number) {
+    super(`today's ${budget} DHL calls are spent; the next look is after midnight`);
+    this.name = "QuotaSpent";
+  }
+}
+
+/**
+ * The key's day at `now`: the calls every DHL behavior counted today, and
+ * the follows running besides this one, read from their `calls` and `status`
+ * resources.
+ */
+export async function readQuota(ctx: MethodContext, now: Date): Promise<Quota> {
+  const [counts, statuses] = await Promise.all([
+    ctx.queryData(`modelType == "${BEHAVIOR_TYPE}" && specName == "calls"`),
+    ctx.queryData(`modelType == "${BEHAVIOR_TYPE}" && specName == "status"`),
+  ]);
+  const others = statuses.filter((r) => {
+    const s = r.attributes as Partial<Status> | null;
+    return r.modelId !== ctx.modelId && s?.following === true && s.nextCheckAt != null &&
+      now.getTime() - Date.parse(s.nextCheckAt) < FOLLOW_GRACE_MS;
+  });
+  return {
+    budget: ctx.globalArgs.dailyBudget,
+    used: callsToday(counts.map((r) => r.attributes), now),
+    follows: others.length + 1,
+    secondsLeft: secondsUntilTomorrow(now),
+  };
+}
+
+/**
+ * Look once and write the status. Returns it, and the seconds until the next
+ * look (null once delivered), for the follow loop to pace by.
+ *
+ * The look is counted in the `calls` resource before DHL is asked, so a look
+ * that fails counts too. With today's calls spent it throws
+ * {@link QuotaSpent} without asking.
+ */
 export async function checkOnce(
   ctx: MethodContext,
   deps: Deps,
   opts: { following: boolean },
-): Promise<{ status: Status; handle: { name: string } }> {
+): Promise<{ status: Status; handle: { name: string }; waitSeconds: number | null }> {
   const g = ctx.globalArgs;
+  const before = await readQuota(ctx, deps.now());
+  if (isSpent(before)) throw new QuotaSpent(before.budget);
+  const counted = countCall(await ctx.readResource(CALLS) as Calls | null, deps.now());
+  await ctx.writeResource("calls", CALLS, { ...counted });
+  const quota = { ...before, used: before.used + 1 };
+
   const shipment = await trackShipment(
     g.trackingNumber,
     {
@@ -175,7 +251,8 @@ export async function checkOnce(
   const now = deps.now();
   const prev = await ctx.readResource(STATUS) as Status | null;
 
-  const wait = nextCheckSeconds(shipment.phase);
+  const pace = nextCheckSeconds(shipment.phase);
+  const wait = pace == null ? null : pacedSeconds(pace, quota);
   const status: Status = {
     carrier: "dhl",
     itemCode: shipment.itemCode,
@@ -197,9 +274,29 @@ export async function checkOnce(
       ? new Date(now.getTime() + wait * 1000).toISOString()
       : null,
     error: null,
+    waiting: null,
   };
   const handle = await ctx.writeResource("status", STATUS, status);
-  return { status, handle };
+  return { status, handle, waitSeconds: wait };
+}
+
+/**
+ * The `snapshot` method: look once. With today's calls spent, a shipment
+ * seen before keeps its status, which then says it is waiting, so the
+ * workflow's follow can start and wait for the new day; one never seen
+ * fails with {@link QuotaSpent}, since its number cannot be checked today.
+ */
+export async function snapshot(ctx: MethodContext, deps: Deps): Promise<{ name: string }> {
+  try {
+    const { status, handle } = await checkOnce(ctx, deps, { following: false });
+    ctx.logger.info("{phase}: {text}", { phase: status.phase, text: status.step.text });
+    return handle;
+  } catch (err) {
+    const prev = err instanceof QuotaSpent ? await ctx.readResource(STATUS) as Status | null : null;
+    if (!prev) throw err;
+    ctx.logger.warn("not looking: {error}", { error: (err as Error).message });
+    return await ctx.writeResource("status", STATUS, { ...prev, waiting: WAITING_FOR_QUOTA });
+  }
 }
 
 /** Consecutive failed looks after which `follow` gives up. */
@@ -231,7 +328,7 @@ export async function follow(
   const deadline = deps.now().getTime() + maxHours * 3600_000;
   let failures = 0;
   let last = await ctx.readResource(STATUS) as Status | null;
-  let handle: { name: string } = { name: STATUS };
+  let handle: { name: string } | null = null;
 
   // The workflow's snapshot looked a moment ago; keep to DHL's one call per 5 s.
   const sinceLast = last ? (deps.now().getTime() - Date.parse(last.checkedAt)) / 1000 : Infinity;
@@ -247,31 +344,50 @@ export async function follow(
       handle = looked.handle;
       last = status;
       failures = 0;
-      waitSeconds = nextCheckSeconds(status.phase);
+      waitSeconds = looked.waitSeconds;
       ctx.logger.info("{phase}: {text}", { phase: status.phase, text: status.step.text });
     } catch (err) {
       if (ctx.signal?.aborted) throw err;
       const error = err instanceof Error ? err.message : String(err);
-      const fatal = err instanceof ParcelNotFound ||
-        (err instanceof HttpError && err.fatal) ||
-        ++failures >= MAX_FAILURES;
-      const retryAfter = err instanceof HttpError ? err.retryAfterSeconds : null;
-      waitSeconds = Math.max(RETRY_SECONDS, retryAfter ?? 0);
-      ctx.logger.warn("look {n} failed: {error}; trying again in {wait} s", {
-        n: failures,
-        error,
-        wait: waitSeconds,
-      });
-      if (last) {
-        last = fatal ? { ...last, error, following: false, nextCheckAt: null } : {
-          ...last,
+      if (err instanceof QuotaSpent) {
+        waitSeconds = secondsUntilTomorrow(deps.now()) + TOMORROW_MARGIN_SECONDS;
+        ctx.logger.info("{error}; looking again in {wait} s", { error, wait: waitSeconds });
+        if (last) {
+          last = {
+            ...last,
+            error: null,
+            waiting: WAITING_FOR_QUOTA,
+            following: true,
+            nextCheckAt: new Date(deps.now().getTime() + waitSeconds * 1000).toISOString(),
+          };
+          handle = await ctx.writeResource("status", STATUS, last);
+        }
+      } else {
+        const fatal = err instanceof ParcelNotFound ||
+          (err instanceof HttpError && err.fatal) ||
+          ++failures >= MAX_FAILURES;
+        const retryAfter = err instanceof HttpError ? err.retryAfterSeconds : null;
+        waitSeconds = Math.max(RETRY_SECONDS, retryAfter ?? 0);
+        // A retry is a call like any other: it keeps to this follow's share of the day.
+        // If the count cannot be read either, the retry's own wait stands.
+        const quota = fatal ? null : await readQuota(ctx, deps.now()).catch(() => null);
+        if (quota) waitSeconds = pacedSeconds(waitSeconds, quota);
+        ctx.logger.warn("look {n} failed: {error}; trying again in {wait} s", {
+          n: failures,
           error,
-          following: true,
-          nextCheckAt: new Date(deps.now().getTime() + waitSeconds * 1000).toISOString(),
-        };
-        handle = await ctx.writeResource("status", STATUS, last);
+          wait: waitSeconds,
+        });
+        if (last) {
+          last = fatal ? { ...last, error, following: false, nextCheckAt: null } : {
+            ...last,
+            error,
+            following: true,
+            nextCheckAt: new Date(deps.now().getTime() + waitSeconds * 1000).toISOString(),
+          };
+          handle = await ctx.writeResource("status", STATUS, last);
+        }
+        if (fatal) throw err;
       }
-      if (fatal) throw err;
     }
 
     if (waitSeconds == null) break;
@@ -283,12 +399,11 @@ export async function follow(
   }
 
   if (last?.following) {
-    last = { ...last, following: false, nextCheckAt: null };
+    last = { ...last, following: false, nextCheckAt: null, waiting: null };
     handle = await ctx.writeResource("status", STATUS, last);
   }
-  return [handle];
+  return handle ? [handle] : [];
 }
-
 async function setArchived(ctx: MethodContext, archived: boolean) {
   const status = await ctx.readResource(STATUS) as Status | null;
   if (!status) throw new Error("no status yet: run snapshot or follow first");
@@ -314,17 +429,21 @@ export const model = {
       lifetime: "30d",
       garbageCollection: 20,
     },
+    calls: {
+      description: "The calls this shipment's looks made to DHL on one Brussels day. Every " +
+        "DHL shipment's count is added up before a look, to keep to the key's calls a day.",
+      schema: z.object({ day: z.string(), count: z.number() }),
+      lifetime: "2d",
+      garbageCollection: 3,
+    },
   },
   methods: {
     snapshot: {
       description: "Look at the shipment once and write its status.",
       arguments: z.object({}),
-      execute: async (_args: Record<string, never>, ctx: MethodContext) => {
-        const deps = realDeps(ctx.globalArgs.apiKey);
-        const { status, handle } = await checkOnce(ctx, deps, { following: false });
-        ctx.logger.info("{phase}: {text}", { phase: status.phase, text: status.step.text });
-        return { dataHandles: [handle] };
-      },
+      execute: async (_args: Record<string, never>, ctx: MethodContext) => ({
+        dataHandles: [await snapshot(ctx, realDeps(ctx.globalArgs.apiKey))],
+      }),
     },
     follow: {
       description: "Keep looking at the shipment, paced by where it is, until it is " +

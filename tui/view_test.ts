@@ -159,3 +159,23 @@ Deno.test("a DHL shipment shows DHL's window and the credit DHL asks for", () =>
   assert(screen.includes("Delivered by Deutsche Post DHL Group"));
   assert(!screen.includes("bpost "));
 });
+
+Deno.test("a DHL shipment out of calls for the day says it is waiting, not broken", () => {
+  const waiting = status({
+    carrier: "dhl",
+    round: null,
+    eta: null,
+    nextCheckAt: "2026-11-06T23:01:00Z",
+    waiting: "waiting for tomorrow's DHL quota",
+  });
+  assertEquals(stateCell(waiting, NOW)[0], "… waiting");
+  const screen = render(
+    view({ rows: [{ name: "dhl-1", status: waiting }], round: null }),
+    NOW,
+    120,
+    30,
+  )
+    .map(strip).join("\n");
+  assert(screen.includes("waiting for tomorrow's DHL quota · next in 12h31"), screen);
+  assert(!screen.includes("error"));
+});

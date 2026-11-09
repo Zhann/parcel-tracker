@@ -21,8 +21,13 @@ pull request and on `main`.
   methods; asks DHL's tracking API with `DHL_API_KEY` from the `default` vault.
   Not in the published manifest yet.
 - `extensions/models/_lib/dhl.ts` — DHL's endpoint and allow-list parse, and
-  pacing that keeps a new key within 250 calls a day. Same rule: nothing about
-  the receiver is written, and only the town of a location.
+  one shipment's pace by phase. Same rule: nothing about the receiver is
+  written, and only the town of a location.
+- `extensions/models/_lib/quota.ts` — the DHL key's calls a day (`dailyBudget`,
+  250), shared by all DHL shipments: every look is counted in its behavior's
+  `calls` resource, follows stretch their pace to share what is left, and none
+  looks once it is spent. Counts are not locked: follows that look in the same
+  moment are covered, two snapshots racing for the day's last call are not.
 - `extensions/models/_lib/status.ts` — the `status` schema both carriers write.
 - `extensions/models/_lib/pace.ts` — pace and ETA from the round's stop counts.
 - `extensions/models/_lib/format.ts` — times and words, shared by the report and the TUI.

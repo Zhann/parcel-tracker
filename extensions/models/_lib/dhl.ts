@@ -7,7 +7,8 @@
  * eCommerce shipments; `service` narrows the search when a number is known to
  * several of them. A new key allows 250 calls a day and one every 5 seconds,
  * across every parcel it follows, so the follow loop paces itself far below
- * bpost's (see {@link nextCheckSeconds}).
+ * bpost's (see {@link nextCheckSeconds}). That pace is one shipment's; the
+ * key's day across shipments is kept in `quota.ts`.
  *
  * Answers carry the receiver's and sender's names, the destination address
  * and, after delivery, the name of whoever signed. None of that is kept: the
@@ -271,8 +272,10 @@ export async function trackShipment(
 }
 
 /**
- * Seconds until the next look, by phase. At most 96 looks a day for a parcel
- * out for delivery all day, so a few parcels share a new key's 250.
+ * Seconds until the next look, by phase: at most 96 looks a day for one
+ * parcel out for delivery all day. This is the quickest a follow looks, not
+ * a limit on the key: three such parcels would make 288 calls. The follow
+ * stretches this pace by the calls left today (`pacedSeconds` in `quota.ts`).
  */
 export function nextCheckSeconds(phase: Phase): number | null {
   switch (phase) {

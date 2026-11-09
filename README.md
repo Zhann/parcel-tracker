@@ -70,9 +70,13 @@ a distance.
 
 The `@zhann/dhl-parcel` behavior asks DHL's Shipment Tracking - Unified API
 instead. There is no postman's round to count stops on, so it shows DHL's own
-delivery estimate. A new key allows 250 calls a day, so `follow` looks every 30
-minutes in transit, every 15 once out for delivery, and every 4 hours at a
-pickup point. As DHL's terms ask, its status expires 30 days after the last
+delivery estimate. `follow` looks every 30 minutes in transit, every 15 once
+out for delivery, and every 4 hours at a pickup point. A new key allows 250
+calls a day for all its shipments together, so every look is counted, and
+shipments followed at the same time look less often as the day's calls run
+low. Once they are spent a shipment shows "waiting for tomorrow's DHL quota"
+and looks again after midnight, Brussels time. A key with more calls a day
+takes `--input dailyBudget=<calls>`. As DHL's terms ask, its status expires 30 days after the last
 look, and every DHL shipment shows "Delivered by Deutsche Post DHL Group". The
 parse keeps no names, no address, and no street inside a location. See
 [docs/research/dhl-tos.md](docs/research/dhl-tos.md).

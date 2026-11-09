@@ -79,6 +79,8 @@ export const StatusSchema = z.object({
   checkedAt: z.string(),
   nextCheckAt: z.string().nullable(),
   error: z.string().nullable(),
+  /** Why no look is being taken for now, in words: a DHL key's calls for the day are spent. */
+  waiting: z.string().nullable().optional(),
 });
 
 /** The parcel as last seen; the `status` resource's content. */

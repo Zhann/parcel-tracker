@@ -104,7 +104,7 @@ export function summarize(s: Status | null, now: Date, failure?: string): Report
     lines.push(`- **${CARRIER_WORD[carrierOf(s)]}** ${windowText(s.window, now)}`);
   }
   const follow = s.following && s.nextCheckAt
-    ? `following, next look ${clock(s.nextCheckAt)}`
+    ? `${s.waiting ?? "following"}, next look ${clock(s.nextCheckAt)}`
     : s.phase === "done"
     ? "done"
     : "not following";
@@ -143,6 +143,7 @@ export function summarize(s: Status | null, now: Date, failure?: string): Report
         }
         : null,
       following: s.following,
+      waiting: s.waiting ?? null,
       error,
       checkedAt: s.checkedAt,
     },

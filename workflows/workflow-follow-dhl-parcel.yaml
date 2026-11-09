@@ -3,7 +3,7 @@ name: "@zhann/follow-dhl-parcel"
 description: >-
   Follow one DHL shipment until it is delivered: look once, so a wrong number
   or a rejected API key fails at once, then keep looking, paced by where the
-  shipment is. Asks DHL's Shipment Tracking - Unified API with the key in the
+  shipment is and by the calls the key has left today. Asks DHL's Shipment Tracking - Unified API with the key in the
   default vault's DHL_API_KEY. The run lasts as long as the shipment's journey
   (maxHours at most); the TUI shows it while it runs.
 tags:
@@ -35,13 +35,19 @@ inputs:
       type: number
       default: 240
       description: Give up after this many hours.
+    dailyBudget:
+      type: number
+      default: 250
+      description: Calls a day the DHL key allows, shared by every shipment followed with it.
   required: [code]
 jobs:
   - name: follow
     description: Look once, then follow until delivered.
     steps:
       - name: snapshot
-        description: Look once and write the status; fails on a number DHL does not know or a rejected key.
+        description: >-
+          Look once and write the status; fails on a number DHL does not know, a rejected key,
+          or a shipment never seen on a day whose calls are spent.
         task:
           type: behavior
           behaviorType: "@zhann/dhl-parcel"
@@ -54,6 +60,7 @@ jobs:
             postalCode: ${{ inputs.postcode }}
             label: ${{ inputs.label }}
             language: ${{ inputs.language }}
+            dailyBudget: ${{ inputs.dailyBudget }}
         dependsOn: []
       - name: follow
         description: Keep looking, paced by phase, until delivered or maxHours.
@@ -69,6 +76,7 @@ jobs:
             postalCode: ${{ inputs.postcode }}
             label: ${{ inputs.label }}
             language: ${{ inputs.language }}
+            dailyBudget: ${{ inputs.dailyBudget }}
           inputs:
             maxHours: ${{ inputs.maxHours }}
         dependsOn:

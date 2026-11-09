@@ -142,6 +142,7 @@ export function stateCell(s: Status, now: Date): Seg {
   if (s.error) return ["❌ error", S.broken];
   if (isStale(s, now)) return ["⚠️ stale", S.degraded];
   if (s.phase === "done") return ["✅ delivered", S.healthy];
+  if (s.following && s.waiting) return ["… waiting", S.degraded];
   if (s.round) return [`● ${s.round.stops} stops`, S.recovering];
   if (s.phase === "out_for_delivery") return ["› on its way", S.recovering];
   if (s.phase === "at_pickup_point") return ["▪ pick it up", S.degraded];
@@ -268,7 +269,9 @@ function detailPane(row: Row | undefined, round: Round | null, now: Date, width:
     follow = ["⚠️ stale: the follow stopped answering; r restarts it", S.degraded];
   } else if (s.following && s.nextCheckAt) {
     follow = [
-      `following · next in ${duration((Date.parse(s.nextCheckAt) - now.getTime()) / 1000)}`,
+      `${s.waiting ?? "following"} · next in ${
+        duration((Date.parse(s.nextCheckAt) - now.getTime()) / 1000)
+      }`,
       S.dim,
     ];
   } else follow = [s.phase === "done" ? "done" : "not following; r follows it", S.dim];

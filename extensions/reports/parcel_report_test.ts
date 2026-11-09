@@ -159,6 +159,21 @@ Deno.test("a DHL shipment shows DHL's window and the credit DHL asks for", () =>
   assertEquals(json.stopsLeft, null);
 });
 
+Deno.test("a DHL shipment out of calls for the day says it is waiting, not failing", () => {
+  const { markdown, json } = summarize({
+    ...DHL,
+    nextCheckAt: "2026-11-06T23:01:00Z",
+    waiting: "waiting for tomorrow's DHL quota",
+  }, NOW);
+  assertStringIncludes(
+    markdown,
+    "- **Checked** 10:59 · waiting for tomorrow's DHL quota, next look 00:01",
+  );
+  assert(!markdown.includes("**Error**"));
+  assertEquals(json.waiting, "waiting for tomorrow's DHL quota");
+  assertEquals(summarize(DHL, NOW).json.waiting, null);
+});
+
 Deno.test("a status without a carrier is bpost's and carries no DHL credit", () => {
   const { markdown, json } = summarize(OUT, NOW);
   assertEquals(json.carrier, "bpost");
