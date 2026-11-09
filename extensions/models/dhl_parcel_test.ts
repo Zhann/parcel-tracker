@@ -9,12 +9,17 @@ import {
   type MethodContext,
   MIN_GAP_SECONDS,
   model,
+  QuotaSpent,
   REPOSITORY_URL,
   requestHeaders,
   RETRY_SECONDS,
+  snapshot,
   type Status,
+  WAITING_FOR_QUOTA,
 } from "./dhl_parcel.ts";
 import { HttpError, ParcelNotFound } from "./_lib/dhl.ts";
+import { brusselsDay } from "./_lib/format.ts";
+import type { Calls } from "./_lib/quota.ts";
 
 const fixture = JSON.parse(
   await Deno.readTextFile(
@@ -69,10 +74,20 @@ function fakeWorld(script: Look[], start = "2026-11-06T09:00:00Z") {
   return { deps, sleeps, urls, advance: (s: number) => (clock += s * 1000) };
 }
 
-function fakeContext() {
-  const store = new Map<string, Record<string, unknown>[]>();
+/** What every behavior wrote, by behavior id and then data name; fake contexts can share one. */
+type Items = Map<string, { spec: string; data: Record<string, unknown> }[]>;
+type Datastore = Map<string, Items>;
+
+function fakeContext(
+  opts: { datastore?: Datastore; id?: string; dailyBudget?: number } = {},
+) {
+  const datastore: Datastore = opts.datastore ?? new Map();
+  const id = opts.id ?? "dhl-7777777770";
+  const own: Items = datastore.get(id) ?? new Map();
+  datastore.set(id, own);
   const logs: string[] = [];
   const ctx: MethodContext = {
+    modelId: id,
     globalArgs: {
       trackingNumber: "7777777770",
       apiKey: "test-key",
@@ -80,18 +95,83 @@ function fakeContext() {
       postalCode: "",
       label: "Lamp",
       language: "EN",
+      dailyBudget: opts.dailyBudget ?? 250,
     },
     logger: {
       info: (m, p) => logs.push(`info ${m} ${JSON.stringify(p)}`),
       warn: (m, p) => logs.push(`warn ${m} ${JSON.stringify(p)}`),
     },
-    writeResource: (_spec, name, data) => {
-      store.set(name, [...(store.get(name) ?? []), structuredClone(data)]);
+    writeResource: (spec, name, data) => {
+      own.set(name, [...(own.get(name) ?? []), { spec, data: structuredClone(data) }]);
       return Promise.resolve({ name });
     },
-    readResource: (name) => Promise.resolve(store.get(name)?.at(-1) ?? null),
+    readResource: (name) => Promise.resolve(own.get(name)?.at(-1)?.data ?? null),
+    // The latest version of every DHL behavior's data, for the specs the predicate names.
+    queryData: (predicate) => {
+      assert(predicate.includes(`modelType == "${BEHAVIOR_TYPE}"`), predicate);
+      const specs = [...predicate.matchAll(/specName == "(\w+)"/g)].map((m) => m[1]);
+      const records = [];
+      for (const [modelId, items] of datastore) {
+        for (const versions of items.values()) {
+          const latest = versions.at(-1)!;
+          if (specs.includes(latest.spec)) records.push({ modelId, attributes: latest.data });
+        }
+      }
+      return Promise.resolve(records);
+    },
   };
-  return { ctx, store, logs };
+  /** Every version this behavior wrote under a data name, oldest first. */
+  const store = { get: (name: string) => own.get(name)?.map((v) => v.data) };
+  return { ctx, store, logs, datastore };
+}
+
+/** Another DHL behavior's data, as if its own method had written it. */
+function seed(datastore: Datastore, id: string, spec: string, data: Record<string, unknown>) {
+  const items: Items = datastore.get(id) ?? new Map();
+  datastore.set(id, items);
+  items.set(spec, [...(items.get(spec) ?? []), { spec, data }]);
+}
+
+/**
+ * One clock for several follows at once: each sleeps on it, and `run` moves
+ * it to the earliest waker once every follow still going is asleep. `calls`
+ * counts the looks DHL got, by Brussels day.
+ */
+function sharedWorld(start: string) {
+  let clock = Date.parse(start);
+  const sleepers: { at: number; wake: () => void }[] = [];
+  const calls = new Map<string, number>();
+  const deps = (answer: (n: number) => Look): Deps => {
+    let n = 0;
+    return {
+      now: () => new Date(clock),
+      sleep: (ms) => new Promise((wake) => sleepers.push({ at: clock + ms, wake })),
+      fetch: () => {
+        const day = brusselsDay(new Date(clock));
+        calls.set(day, (calls.get(day) ?? 0) + 1);
+        const look = answer(n++);
+        return Promise.resolve(
+          look === "fail" ? new Response("down", { status: 502 }) : Response.json(look),
+        );
+      },
+    };
+  };
+  async function run(tasks: Promise<unknown>[]) {
+    let going = tasks.length;
+    const all = Promise.all(tasks.map((t) => t.finally(() => going--)));
+    while (going > 0) {
+      if (sleepers.length < going) {
+        await new Promise((tick) => setTimeout(tick, 0));
+        continue;
+      }
+      sleepers.sort((a, b) => a.at - b.at);
+      const next = sleepers.shift()!;
+      clock = Math.max(clock, next.at);
+      next.wake();
+    }
+    await all;
+  }
+  return { deps, run, calls };
 }
 
 Deno.test("the model's literal type is the one its data is queried by", () => {
@@ -222,4 +302,148 @@ Deno.test("cleanApiKey refuses a key no header can carry, without showing it", (
     const err = assertThrows(() => cleanApiKey(bad), Error, "swamp vault put default DHL_API_KEY");
     assert(!bad.trim() || !err.message.includes(bad.trim()));
   }
+});
+
+// ── the key's calls a day ──────────────────────────────────────────────────
+
+/** 10:00 in Brussels: 14 hours of the day left. */
+const MORNING = "2026-11-06T09:00:00Z";
+const TODAY = "2026-11-06";
+
+Deno.test("every look counts: the snapshot, the follow's, a restart's and a retry's", async () => {
+  const { ctx, store } = fakeContext();
+  const world = fakeWorld([OUT, OUT, DELIVERED, "fail", DELIVERED], MORNING);
+  const counted = () => store.get("calls")!.at(-1) as unknown as Calls;
+
+  await snapshot(ctx, world.deps);
+  assertEquals(counted(), { day: TODAY, count: 1 });
+  world.advance(60);
+  await follow(ctx, world.deps, 240);
+  assertEquals(counted(), { day: TODAY, count: 3 });
+  // A follow started again, whose first look fails and is retried.
+  await follow(ctx, world.deps, 240);
+  assertEquals(counted(), { day: TODAY, count: 5 });
+  assertEquals(world.urls.length, 5);
+});
+
+Deno.test("a follow stretches its pace when other follows have used most of the day", async () => {
+  const { ctx, store, datastore } = fakeContext();
+  const now = Date.parse(MORNING);
+  seed(datastore, "dhl-other", "calls", { day: TODAY, count: 149 });
+  seed(datastore, "dhl-other", "status", {
+    following: true,
+    nextCheckAt: new Date(now + 600_000).toISOString(),
+  });
+  const { deps, sleeps } = fakeWorld([OUT, DELIVERED], MORNING);
+  await follow(ctx, deps, 240);
+  // 100 calls left after this look, for 2 follows over 14 hours: 50 400 × 2 / 100.
+  assertEquals(sleeps, [1008]);
+  const first = (store.get("status") as Status[])[0];
+  assertEquals(first.nextCheckAt, new Date(now + 1008_000).toISOString());
+});
+
+Deno.test("a follow that stopped without saying so takes no share", async () => {
+  const { ctx, datastore } = fakeContext();
+  seed(datastore, "dhl-other", "calls", { day: TODAY, count: 149 });
+  seed(datastore, "dhl-gone", "status", {
+    following: true,
+    nextCheckAt: new Date(Date.parse(MORNING) - 3600_000).toISOString(),
+  });
+  const { deps, sleeps } = fakeWorld([OUT, DELIVERED], MORNING);
+  await follow(ctx, deps, 240);
+  assertEquals(sleeps, [900]);
+});
+
+Deno.test("a spent budget shows as waiting for tomorrow's quota, not as an error", async () => {
+  const { ctx, store, datastore } = fakeContext();
+  const { deps, sleeps, urls } = fakeWorld([OUT, DELIVERED], MORNING);
+  await snapshot(ctx, deps);
+  seed(datastore, "dhl-other", "calls", { day: TODAY, count: 249 });
+  await follow(ctx, deps, 240);
+
+  // Six seconds after the snapshot, then to a minute past Brussels midnight.
+  assertEquals(sleeps, [MIN_GAP_SECONDS, 14 * 3600 - MIN_GAP_SECONDS + 60]);
+  const [, waiting, delivered] = store.get("status") as Status[];
+  assertEquals(waiting.waiting, WAITING_FOR_QUOTA);
+  assertEquals(waiting.error, null);
+  assertEquals(waiting.following, true);
+  assertEquals(waiting.nextCheckAt, "2026-11-06T23:01:00.000Z");
+  assertEquals(delivered.phase, "done");
+  assertEquals(delivered.waiting, null);
+  assertEquals(urls.length, 2);
+  assertEquals(store.get("calls")!.at(-1), { day: "2026-11-07", count: 1 });
+});
+
+Deno.test("a snapshot with the budget spent does not look", async () => {
+  const { ctx, store, datastore } = fakeContext();
+  const { deps, urls } = fakeWorld([OUT], MORNING);
+  seed(datastore, "dhl-other", "calls", { day: TODAY, count: 250 });
+
+  // A shipment never seen cannot be checked today: the workflow fails, saying why.
+  await assertRejects(() => snapshot(ctx, deps), QuotaSpent, "250 DHL calls");
+  assertEquals(urls.length, 0);
+
+  // One seen before keeps its status, so the follow after it can wait for tomorrow.
+  seed(datastore, "dhl-other", "calls", { day: TODAY, count: 0 });
+  await snapshot(ctx, deps);
+  seed(datastore, "dhl-other", "calls", { day: TODAY, count: 249 });
+  await snapshot(ctx, deps);
+  assertEquals(urls.length, 1);
+  const kept = store.get("status")!.at(-1) as Status;
+  assertEquals(kept.phase, "out_for_delivery");
+  assertEquals(kept.waiting, WAITING_FOR_QUOTA);
+});
+
+Deno.test("the budget is an argument, 250 unless a key allows more", async () => {
+  const args = model.globalArguments.parse({ trackingNumber: "7777777770", apiKey: "k" });
+  assertEquals(args.dailyBudget, 250);
+
+  const { ctx, datastore } = fakeContext({ dailyBudget: 1000 });
+  seed(datastore, "dhl-other", "calls", { day: TODAY, count: 400 });
+  const { deps, urls } = fakeWorld([DELIVERED], MORNING);
+  await follow(ctx, deps, 240);
+  assertEquals(urls.length, 1);
+});
+
+Deno.test("six shipments out for delivery for two days stay within 250 calls a day", async () => {
+  const world = sharedWorld("2026-11-05T23:30:00Z");
+  const datastore: Datastore = new Map();
+  const follows = [];
+  for (let i = 0; i < 6; i++) {
+    const { ctx } = fakeContext({ datastore, id: `dhl-${i}` });
+    // The third shipment's looks fail every other time, and are retried.
+    const deps = world.deps((n) => i === 2 && n % 2 === 1 ? "fail" : OUT);
+    follows.push(snapshot(ctx, deps).then(() => follow(ctx, deps, 47)));
+  }
+  await world.run(follows);
+
+  const days = [...world.calls.entries()];
+  assertEquals(days.map(([day]) => day), ["2026-11-06", "2026-11-07"]);
+  for (const [day, calls] of days) {
+    assert(calls <= 250, `${calls} calls on ${day}`);
+    // Without a shared budget these would be 576 a day; nor is the day left unused.
+    assert(calls >= 200, `only ${calls} calls on ${day}`);
+  }
+});
+
+Deno.test("shipments started through the day, and restarted, stay within a small budget", async () => {
+  const world = sharedWorld("2026-11-05T23:30:00Z");
+  const datastore: Datastore = new Map();
+  const follows = [];
+  for (let i = 0; i < 4; i++) {
+    const { ctx } = fakeContext({ datastore, id: `dhl-${i}`, dailyBudget: 40 });
+    const deps = world.deps(() => OUT);
+    // Each starts i × 3 hours into the day, follows 5 hours, and is restarted twice.
+    const run = async () => {
+      await deps.sleep(i * 3 * 3600_000);
+      for (let restart = 0; restart < 3; restart++) {
+        await snapshot(ctx, deps);
+        await follow(ctx, deps, 5);
+      }
+    };
+    follows.push(run());
+  }
+  await world.run(follows);
+  for (const [day, calls] of world.calls) assert(calls <= 40, `${calls} calls on ${day}`);
+  assert(world.calls.get("2026-11-06")! >= 30, `only ${world.calls.get("2026-11-06")} calls`);
 });

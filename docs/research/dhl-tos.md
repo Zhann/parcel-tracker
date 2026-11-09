@@ -23,7 +23,7 @@ when you create the app, before relying on it.
 
 | DHL asks | The behavior |
 | --- | --- |
-| A new key: 250 calls a day, at most one every 5 seconds; more on request. | `follow` looks every 30 min in transit, 15 min out for delivery, 4 h at a pickup point (≤ 96 calls a day per shipment). It leaves at least 6 s after the workflow's snapshot, retries after 5 min, and honours `Retry-After` on a 429. |
+| A new key: 250 calls a day, at most one every 5 seconds; more on request. | `follow` looks every 30 min in transit, 15 min out for delivery, 4 h at a pickup point (≤ 96 calls a day per shipment). Every look (snapshots and retries too) is counted per Brussels day across all DHL shipments; follows look less often to share the calls left, and none looks once `dailyBudget` (250) is spent, until after midnight. The count is not locked: looks by follows in the same moment are allowed for, two snapshots racing for the day's last call are not. It leaves at least 6 s after the workflow's snapshot (not between different shipments), retries after 5 min, and honours `Retry-After` on a 429. |
 | Use tracking data only for your own, or your customers', tracking. | It follows your own shipments. Nothing is sent anywhere. |
 | Don't share it with third parties, combine it with advertising, or mine it for competitive insight. | The datastore stays local (see CLAUDE.md). There is no advertising and no analysis beyond the one shipment. |
 | Delete tracking data 30 days after delivery, unless agreed otherwise. | The `status` resource has a `30d` lifetime. A follow takes its last look at delivery, so that look expires about 30 days after it. A shipment only ever `snapshot`ed expires 30 days after that snapshot. |
