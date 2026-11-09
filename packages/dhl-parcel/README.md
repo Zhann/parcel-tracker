@@ -12,7 +12,9 @@ shipments, within the limits DHL sets for your key.
 DHL's tracking API wants a key. It is free: create an app at
 [developer.dhl.com](https://developer.dhl.com/api-reference/shipment-tracking) and add the "Shipment
 Tracking - Unified" API to it. Creating the app is where you accept DHL's terms for the API; this
-package does not accept them for you, and everything it asks DHL counts against your key.
+package does not accept them for you, and everything it asks DHL counts against your key. Keep the
+key to yourself: DHL's terms forbid making it available to anyone else, so everyone who follows
+shipments creates their own.
 
 The workflow reads the key from the repo's `default` vault as `DHL_API_KEY`. Create the vault if the
 repo has none, then store the API key (the key only, not the secret), which is asked for with hidden
