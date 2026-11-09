@@ -2,10 +2,10 @@
 
 # Parcel tracker
 
-Swamp workflow that follows a bpost parcel to the doorstep, with a terminal view of its stops left and ETA. The datastore stays local, so parcel data never leaves this machine.
+Swamp workflow that follows a bpost parcel to the doorstep, with a terminal view of its stops left and ETA. It follows DHL shipments too, by DHL's own estimate. The datastore stays local, so parcel data never leaves this machine.
 
-Unofficial: not made by, endorsed by or affiliated with bpost. It is meant for following your own
-parcels, at the same pace bpost's own tracking page looks.
+Unofficial: not made by, endorsed by or affiliated with bpost or DHL. It is meant for following your
+own parcels, at the same pace bpost's own tracking page looks, and within DHL's API limits.
 
 ```text
  Parcels                                                                   11:30
@@ -28,11 +28,25 @@ parcels, at the same pace bpost's own tracking page looks.
 deno task tui                       # PARCEL_POSTCODE=9050 pre-fills the postal code
 ```
 
-`a` adds a parcel by starting the `@zhann/follow-parcel` workflow in the background; it
-keeps running after the TUI quits. Without the TUI:
+`a` adds a parcel by starting its carrier's follow workflow in the background; it
+keeps running after the TUI quits. A 10-digit DHL Express waybill, or a DHL
+`JJD…`/`JVGL…` number, is followed with DHL and skips the postal code; any other
+code with bpost. Without the TUI:
 
 ```bash
 swamp workflow run @zhann/follow-parcel --input code=<tracking code> --input postcode=<postal code> --input label=<name>
+swamp workflow run @zhann/follow-dhl-parcel --input code=<tracking number> --input label=<name>
+```
+
+### DHL needs an API key
+
+DHL's tracking API wants a key, free with an app at
+[developer.dhl.com](https://developer.dhl.com/api-reference/shipment-tracking)
+(add the "Shipment Tracking - Unified" API to it). Store it once in the repo's
+local vault:
+
+```bash
+swamp vault put default DHL_API_KEY
 ```
 
 ## How it works
@@ -53,3 +67,12 @@ with fewer than three a fixed 2–3–5 minute guess stands in and says so.
 The receiver's name, street and coordinates are in bpost's answers and are
 never written: the parse copies out an allow-list and turns the coordinates into
 a distance.
+
+The `@zhann/dhl-parcel` behavior asks DHL's Shipment Tracking - Unified API
+instead. There is no postman's round to count stops on, so it shows DHL's own
+delivery estimate. A new key allows 250 calls a day, so `follow` looks every 30
+minutes in transit, every 15 once out for delivery, and every 4 hours at a
+pickup point. As DHL's terms ask, its status expires 30 days after the last
+look, and every DHL shipment shows "Delivered by Deutsche Post DHL Group". The
+parse keeps no names, no address, and no street inside a location. See
+[docs/research/dhl-tos.md](docs/research/dhl-tos.md).

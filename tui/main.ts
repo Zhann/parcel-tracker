@@ -2,14 +2,17 @@
  * The parcel TUI: `deno task tui` from the repo root.
  *
  * Reads every parcel's status from swamp every few seconds and redraws every
- * second. Adding a parcel starts the `@zhann/follow-parcel` workflow detached, so the
- * follow outlives the TUI; the TUI is only ever a window onto swamp's data.
+ * second. Adding a parcel starts its carrier's follow workflow detached, so the
+ * follow outlives the TUI; the TUI is only ever a window onto swamp's data. A
+ * code shaped like a DHL number is followed with DHL, which needs no postal
+ * code; anything else with bpost.
  *
  * PARCEL_POSTCODE pre-fills the postal code when adding.
  *
  * @module
  */
 import {
+  carrierFor,
   cliRunner,
   CODE_PATTERN,
   deleteParcel,
@@ -107,8 +110,13 @@ function onPromptKey(key: string) {
     prompt = null;
     say("not added");
   } else if (key === "\r") {
-    if (f.key === "code" && !CODE_PATTERN.test(f.value.trim())) {
-      return say("that is not a bpost tracking code");
+    if (f.key === "code") {
+      if (carrierFor(f.value) === "dhl") {
+        // DHL needs no postal code.
+        p.fields = p.fields.filter((x) => x.key !== "postcode");
+      } else if (!CODE_PATTERN.test(f.value.trim())) {
+        return say("that is not a bpost or DHL tracking code");
+      }
     }
     if (f.key === "postcode" && !POSTCODE_PATTERN.test(f.value.trim())) {
       return say("that is not a postal code");
@@ -116,9 +124,11 @@ function onPromptKey(key: string) {
     if (p.index < p.fields.length - 1) {
       p.index++;
     } else {
-      const values = Object.fromEntries(
-        p.fields.map((x) => [x.key, x.value.trim()]),
-      ) as unknown as NewParcel;
+      const values: NewParcel = {
+        postcode: "",
+        ...Object.fromEntries(p.fields.map((x) => [x.key, x.value.trim()])),
+      } as NewParcel;
+      values.carrier = carrierFor(values.code);
       prompt = null;
       say(`starting to follow ${values.label || values.code}…`, 10_000);
       act(async () => {
@@ -191,7 +201,7 @@ function onKey(key: string): boolean {
       }
       say(`following ${title(row.status)} again…`, 10_000);
       act(async () => {
-        await startFollow(repoDir, await parcelArgs(run, row.name));
+        await startFollow(repoDir, await parcelArgs(run, row));
         return `following ${title(row.status)}`;
       });
       break;

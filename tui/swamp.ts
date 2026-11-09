@@ -1,11 +1,14 @@
 /**
  * The TUI's only way in or out: the swamp CLI. Reads go through
- * `swamp data query`; actions start the `@zhann/follow-parcel` workflow or run a
- * behavior method. Nothing here reads `.swamp/` directly.
+ * `swamp data query`; actions start the `@zhann/follow-parcel` or
+ * `@zhann/follow-dhl-parcel` workflow or run a behavior method. Nothing here
+ * reads `.swamp/` directly.
  *
  * @module
  */
-import { BEHAVIOR_TYPE, type Round, type Status } from "../extensions/models/bpost_parcel.ts";
+import { BEHAVIOR_TYPE, type Round } from "../extensions/models/bpost_parcel.ts";
+import { BEHAVIOR_TYPE as DHL_BEHAVIOR_TYPE } from "../extensions/models/dhl_parcel.ts";
+import { type Carrier, carrierOf, type Status } from "../extensions/models/_lib/status.ts";
 import type { Row } from "./view.ts";
 
 export interface Runner {
@@ -45,7 +48,8 @@ const plainName = (s: string) => /^[\w.-]+$/.test(s);
 export async function listParcels(run: Runner): Promise<Row[]> {
   const rows = await query<Row>(
     run,
-    `modelType == "${BEHAVIOR_TYPE}" && specName == "status"`,
+    `(modelType == "${BEHAVIOR_TYPE}" || modelType == "${DHL_BEHAVIOR_TYPE}") && ` +
+      `specName == "status"`,
     '{"name": modelName, "status": attributes}',
   );
   return rows
@@ -65,36 +69,68 @@ export async function latestRound(run: Runner, name: string): Promise<Round | nu
 }
 
 export interface NewParcel {
+  /** bpost when absent. */
+  carrier?: Carrier;
   code: string;
+  /** Required for bpost; DHL only uses it for Parcel Germany and Netherlands. */
   postcode: string;
   label: string;
+  /** DHL's service for the number; empty lets DHL find it. */
+  service?: string;
 }
 
 export const CODE_PATTERN = /^[A-Za-z0-9]{8,40}$/;
+export const DHL_CODE_PATTERN = /^[A-Za-z0-9-]{6,40}$/;
 export const POSTCODE_PATTERN = /^[A-Za-z0-9 -]{3,10}$/;
 
+/** The follow workflow of each carrier. */
+export const FOLLOW_WORKFLOW: Record<Carrier, string> = {
+  bpost: "@zhann/follow-parcel",
+  dhl: "@zhann/follow-dhl-parcel",
+};
+
 /**
- * Start `@zhann/follow-parcel` detached from the TUI, so quitting the TUI or closing
- * its pane leaves it running. Its output goes to `logs/<code>.log`.
+ * The carrier a tracking code looks like it belongs to: a 10-digit DHL
+ * Express waybill or a DHL Parcel `JJD…`/`JVGL…` number is DHL's, anything
+ * else bpost's. bpost codes are 13-character S10 codes or 24 digits.
  */
-export async function startFollow(repoDir: string, p: NewParcel): Promise<string> {
-  if (!CODE_PATTERN.test(p.code)) throw new Error("that is not a bpost tracking code");
-  if (!POSTCODE_PATTERN.test(p.postcode)) throw new Error("that is not a postal code");
-  await Deno.mkdir(`${repoDir}/logs`, { recursive: true });
-  const log = `${repoDir}/logs/${p.code}.log`;
-  const args = [
+export function carrierFor(code: string): Carrier {
+  return /^\d{10}$|^(JJD|JVGL)[A-Z0-9]{8,}$/i.test(code.trim()) ? "dhl" : "bpost";
+}
+
+/** The `swamp workflow run` arguments that follow a parcel. */
+export function followArgs(repoDir: string, p: NewParcel): string[] {
+  const carrier = p.carrier ?? "bpost";
+  if (carrier === "dhl") {
+    if (!DHL_CODE_PATTERN.test(p.code)) throw new Error("that is not a DHL tracking number");
+    if (p.postcode && !POSTCODE_PATTERN.test(p.postcode)) {
+      throw new Error("that is not a postal code");
+    }
+  } else {
+    if (!CODE_PATTERN.test(p.code)) throw new Error("that is not a bpost tracking code");
+    if (!POSTCODE_PATTERN.test(p.postcode)) throw new Error("that is not a postal code");
+  }
+  const inputs: Record<string, string> = { code: p.code, label: p.label };
+  if (carrier === "bpost" || p.postcode) inputs.postcode = p.postcode;
+  if (carrier === "dhl" && p.service) inputs.service = p.service;
+  return [
     "workflow",
     "run",
-    "@zhann/follow-parcel",
+    FOLLOW_WORKFLOW[carrier],
     "--repo-dir",
     repoDir,
-    "--input",
-    `code=${p.code}`,
-    "--input",
-    `postcode=${p.postcode}`,
-    "--input",
-    `label=${p.label}`,
+    ...Object.entries(inputs).flatMap(([k, v]) => ["--input", `${k}=${v}`]),
   ];
+}
+
+/**
+ * Start the carrier's follow workflow detached from the TUI, so quitting the
+ * TUI or closing its pane leaves it running. Its output goes to `logs/<code>.log`.
+ */
+export async function startFollow(repoDir: string, p: NewParcel): Promise<string> {
+  const args = followArgs(repoDir, p);
+  await Deno.mkdir(`${repoDir}/logs`, { recursive: true });
+  const log = `${repoDir}/logs/${p.code}.log`;
   const child = new Deno.Command("setsid", {
     args: [
       "-f",
@@ -114,26 +150,36 @@ export async function startFollow(repoDir: string, p: NewParcel): Promise<string
   return log;
 }
 
-/** Ids of the running `@zhann/follow-parcel` runs for a tracking code. */
+/** Ids of the running follow runs, of either carrier, for a tracking code. */
 export async function runningFollows(run: Runner, code: string): Promise<string[]> {
-  if (!CODE_PATTERN.test(code)) return [];
+  if (!CODE_PATTERN.test(code) && !DHL_CODE_PATTERN.test(code)) return [];
+  const names = Object.values(FOLLOW_WORKFLOW).map((w) => `workflowName == "${w}"`).join(" || ");
   const r = await run([
     "workflow",
     "history",
     "search",
     "--json",
     "--filter",
-    `workflowName == "@zhann/follow-parcel" && status == "running" && inputs.code == "${code}"`,
+    `(${names}) && status == "running" && inputs.code == "${code}"`,
   ]);
   if (!r.ok) throw new Error(errorOf(r.stderr));
   return (JSON.parse(r.stdout).results ?? []).map((x: { runId: string }) => x.runId);
 }
 
-/** The tracking code, postal code and label a parcel was added with. */
-export async function parcelArgs(run: Runner, name: string): Promise<NewParcel> {
-  const r = await run(["behavior", "get", name, "--json"]);
+/** The carrier, tracking code, postal code and label a parcel was added with. */
+export async function parcelArgs(run: Runner, row: Row): Promise<NewParcel> {
+  const r = await run(["behavior", "get", row.name, "--json"]);
   if (!r.ok) throw new Error(errorOf(r.stderr));
   const g = JSON.parse(r.stdout).globalArguments ?? {};
+  if (carrierOf(row.status) === "dhl") {
+    return {
+      carrier: "dhl",
+      code: g.trackingNumber,
+      postcode: g.postalCode ?? "",
+      label: g.label ?? "",
+      service: g.service ?? "",
+    };
+  }
   return { code: g.itemCode, postcode: g.postalCode, label: g.label ?? "" };
 }
 

@@ -1,6 +1,7 @@
 /**
  * Words and times for a parcel, shared by the `@zhann/parcel-report` report
- * and the TUI. Times are Brussels-local: bpost's windows and events are.
+ * and the TUI. Times are Brussels-local, as bpost's windows and events are;
+ * DHL's are converted to it.
  *
  * @module
  */
@@ -62,4 +63,15 @@ export function eventStamp(at: string): string {
 export function fromNow(iso: string, now: Date): string {
   const minutes = Math.round((Date.parse(iso) - now.getTime()) / 60_000);
   return minutes <= 1 ? "any minute" : `in ${minutes} min`;
+}
+
+/**
+ * A carrier's delivery window, seen from `now`: `today 11:10–14:15`, or
+ * `tomorrow by 12:00` when it gives one time, or just the day.
+ */
+export function windowText(w: { day: string; from: string; to: string }, now: Date): string {
+  const day = relativeDay(w.day, now);
+  if (!w.from && !w.to) return day;
+  if (!w.from || w.from === w.to) return `${day} by ${w.to || w.from}`;
+  return `${day} ${w.from}–${w.to}`;
 }

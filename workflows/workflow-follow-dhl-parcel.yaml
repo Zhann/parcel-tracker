@@ -1,0 +1,79 @@
+id: 36f66dbc-4824-4421-a9d4-1f402264b299
+name: "@zhann/follow-dhl-parcel"
+description: >-
+  Follow one DHL shipment until it is delivered: look once, so a wrong number
+  or a rejected API key fails at once, then keep looking, paced by where the
+  shipment is. Asks DHL's Shipment Tracking - Unified API with the key in the
+  default vault's DHL_API_KEY. The run lasts as long as the shipment's journey
+  (maxHours at most); the TUI shows it while it runs.
+tags:
+  carrier: dhl
+vaults: [default]
+inputs:
+  properties:
+    code:
+      type: string
+      description: The DHL tracking number (waybill).
+    service:
+      type: string
+      default: ""
+      description: DHL's service for the number (express, parcel-de, ecommerce, …); empty lets DHL find it.
+    postcode:
+      type: string
+      default: ""
+      description: The delivery address's postal code; only DHL Parcel Germany and Netherlands use it.
+    label:
+      type: string
+      default: ""
+      description: A name for the shipment in the TUI. Empty shows the sender.
+    language:
+      type: string
+      enum: [EN, NL, FR, DE]
+      default: EN
+      description: Language of DHL's texts; out for delivery is only recognised in English.
+    maxHours:
+      type: number
+      default: 240
+      description: Give up after this many hours.
+  required: [code]
+jobs:
+  - name: follow
+    description: Look once, then follow until delivered.
+    steps:
+      - name: snapshot
+        description: Look once and write the status; fails on a number DHL does not know or a rejected key.
+        task:
+          type: behavior
+          behaviorType: "@zhann/dhl-parcel"
+          behaviorName: dhl-${{ inputs.code }}
+          methodName: snapshot
+          globalArgs:
+            trackingNumber: ${{ inputs.code }}
+            apiKey: ${{ vault.get(default, DHL_API_KEY) }}
+            service: ${{ inputs.service }}
+            postalCode: ${{ inputs.postcode }}
+            label: ${{ inputs.label }}
+            language: ${{ inputs.language }}
+        dependsOn: []
+      - name: follow
+        description: Keep looking, paced by phase, until delivered or maxHours.
+        task:
+          type: behavior
+          behaviorType: "@zhann/dhl-parcel"
+          behaviorName: dhl-${{ inputs.code }}
+          methodName: follow
+          globalArgs:
+            trackingNumber: ${{ inputs.code }}
+            apiKey: ${{ vault.get(default, DHL_API_KEY) }}
+            service: ${{ inputs.service }}
+            postalCode: ${{ inputs.postcode }}
+            label: ${{ inputs.label }}
+            language: ${{ inputs.language }}
+          inputs:
+            maxHours: ${{ inputs.maxHours }}
+        dependsOn:
+          - step: snapshot
+            condition:
+              type: succeeded
+    dependsOn: []
+version: 1

@@ -1,0 +1,102 @@
+{
+  "shipments": [
+    {
+      "id": "7777777770",
+      "service": "express",
+      "origin": {
+        "address": {
+          "countryCode": "NL",
+          "postalCode": "1043 AG",
+          "addressLocality": "Voorbeeldstraat 1, AMSTERDAM"
+        }
+      },
+      "destination": {
+        "address": {
+          "countryCode": "BE",
+          "postalCode": "9000",
+          "addressLocality": "Teststraat 99, GENT"
+        }
+      },
+      "status": {
+        "timestamp": "2026-11-06T08:41:00+01:00",
+        "location": {
+          "address": {
+            "addressLocality": "GHENT - BELGIUM"
+          }
+        },
+        "statusCode": "transit",
+        "status": "WC",
+        "description": "Shipment is out with courier for delivery"
+      },
+      "estimatedTimeOfDelivery": "2026-11-06T18:00:00+01:00",
+      "estimatedDeliveryTimeFrame": {
+        "estimatedFrom": "2026-11-06T09:00:00+01:00",
+        "estimatedThrough": "2026-11-06T18:00:00+01:00"
+      },
+      "estimatedTimeOfDeliveryRemark": "By End of Day",
+      "details": {
+        "carrier": {
+          "@type": "Organization",
+          "organizationName": "EXPRESS"
+        },
+        "product": {
+          "productName": "EXPRESS WORLDWIDE"
+        },
+        "receiver": {
+          "@type": "Person",
+          "familyName": "Receiver",
+          "givenName": "Rita",
+          "name": "Rita Receiver"
+        },
+        "sender": {
+          "@type": "Organization",
+          "organizationName": "Example Shop BV",
+          "familyName": "Sender",
+          "givenName": "Sam",
+          "name": "Sam Sender"
+        },
+        "proofOfDelivery": {
+          "signed": {
+            "@type": "Person",
+            "name": "Rita Receiver"
+          }
+        },
+        "totalNumberOfPieces": 1,
+        "pieceIds": ["JD014600000000000001"],
+        "weight": {
+          "value": 1.2,
+          "unitText": "kg"
+        }
+      },
+      "events": [
+        {
+          "timestamp": "2026-11-06T08:41:00+01:00",
+          "location": { "address": { "addressLocality": "GHENT - BELGIUM" } },
+          "statusCode": "transit",
+          "status": "WC",
+          "description": "Shipment is out with courier for delivery"
+        },
+        {
+          "timestamp": "2026-11-06T06:12:00+01:00",
+          "location": { "address": { "addressLocality": "GHENT - BELGIUM" } },
+          "statusCode": "transit",
+          "status": "AF",
+          "description": "Arrived at DHL Delivery Facility in GHENT - BELGIUM"
+        },
+        {
+          "timestamp": "2026-11-05T21:30:00+01:00",
+          "location": { "address": { "addressLocality": "Voorbeeldstraat 1, AMSTERDAM" } },
+          "statusCode": "transit",
+          "status": "PU",
+          "description": "Shipment picked up"
+        },
+        {
+          "timestamp": "2026-11-05T15:02:00",
+          "statusCode": "pre-transit",
+          "status": "SA",
+          "description": "Shipment information received"
+        }
+      ]
+    }
+  ]
+}
