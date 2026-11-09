@@ -12,9 +12,12 @@
  *
  * The count is read and then written without a lock, so follows that look in
  * the same moment do not see each other's call. {@link isSpent} covers that
- * by leaving one call for every other running follow. What it does not cover
- * is looks that are not a follow's: two `snapshot`s in the same moment as the
- * last call of the day can each take it.
+ * by leaving one call for every other running follow, which a follow is from
+ * the moment it starts, if its shipment has a status to say so on. What it
+ * does not cover: two `snapshot`s in the same moment as the last call of the
+ * day can each take it, and so can a follow started without a snapshot
+ * before it. Every shipment judges the shared count by its own `dailyBudget`,
+ * so shipments on one key should be given the same one.
  *
  * The day is the Brussels calendar day. DHL does not say when its own day
  * starts; if it differs, DHL's 429 is still retried as before.
