@@ -19,7 +19,6 @@ pull request and on `main`.
   ever written; keep it that way, and keep fixtures scrubbed.
 - `extensions/models/dhl_parcel.ts` — the `@zhann/dhl-parcel` behavior, same
   methods; asks DHL's tracking API with `DHL_API_KEY` from the `default` vault.
-  Not in the published manifest yet.
 - `extensions/models/_lib/dhl.ts` — DHL's endpoint and allow-list parse, and
   one shipment's pace by phase. Same rule: nothing about the receiver is
   written, and only the town of a location.
@@ -28,7 +27,11 @@ pull request and on `main`.
   `calls` resource, follows stretch their pace to share what is left, and none
   looks once it is spent. Counts are not locked: follows that look in the same
   moment are covered, two snapshots racing for the day's last call are not.
-- `extensions/models/_lib/status.ts` — the `status` schema both carriers write.
+- `extensions/models/_lib/status.ts` — the `status` schema both carriers write,
+  and the phases a parcel goes through.
+- `extensions/models/_lib/http.ts` — HTTP helpers both carriers share. A carrier's
+  lib never imports the other carrier's, so neither package ships the other's
+  code.
 - `extensions/models/_lib/pace.ts` — pace and ETA from the round's stop counts.
 - `extensions/models/_lib/format.ts` — times and words, shared by the report and the TUI.
 - `extensions/reports/parcel_report.ts` — `@zhann/parcel-report`, the parcel at a
@@ -36,6 +39,9 @@ pull request and on `main`.
 - `workflows/workflow-follow-parcel.yaml` — snapshot, then follow.
 - `workflows/workflow-follow-dhl-parcel.yaml` — the same for DHL.
 - `tui/` — the terminal view; it only talks to swamp through the CLI.
+- `packages/<name>/` — one directory per published package: its `manifest.yaml`,
+  and the `README.md` and `LICENSE` that ship with it. `packages_test.ts` checks
+  the rules below.
 
 ## Validation
 
@@ -50,12 +56,26 @@ Never point `.swamp.yaml` at a shared datastore.
 
 ## Publishing
 
-The extension is published to swamp-club as `@zhann/bpost-parcel` from
-`extensions/models/manifest.yaml`; its `README.md` and `LICENSE` beside the
-manifest ship with it. Every workflow name and behavior type in it carries the
-`@zhann/` prefix, or the push refuses it. A new version bumps `version` in the
-manifest and `model.version` together, then follows the `swamp` skill's
-publishing guide: the push wants a review report bound to the exact code.
+Three packages go to swamp-club, each from `packages/<name>/manifest.yaml`, with
+the `README.md` and `LICENSE` beside it:
+
+- `@zhann/parcel-report` — the `@zhann/parcel-report` report and the libs it
+  imports. A report name can live in only one installed package, so both carriers
+  depend on this one rather than ship their own copy.
+- `@zhann/bpost-parcel` — the bpost behavior and `@zhann/follow-parcel`.
+- `@zhann/dhl-parcel` — the DHL behavior and `@zhann/follow-dhl-parcel`.
+
+Both carrier packages list `@zhann/parcel-report` under `dependencies`, and
+neither brings the other carrier. Push `@zhann/parcel-report` first when it
+changes: the dry run does not check that a dependency is on the registry. The
+shared `_lib/` modules are bundled into every package that imports them, so a
+change to `status.ts` or `format.ts` means a new version of all three.
+
+Every workflow name and behavior type carries the `@zhann/` prefix, or the push
+refuses it. A new version of a carrier package bumps `version` in its manifest
+and `model.version` together, with an `upgrades` entry ending at that version.
+Then follow the `swamp` skill's publishing guide: each push wants a review report
+bound to the exact code.
 
 <!-- BEGIN swamp managed section - DO NOT EDIT -->
 # Project

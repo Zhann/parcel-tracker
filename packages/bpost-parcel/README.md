@@ -10,6 +10,8 @@ turns the van's position into a distance.
 Unofficial: not made by, endorsed by or affiliated with bpost. It is meant for following your own
 parcels, at the same pace bpost's own tracking page looks.
 
+For DHL shipments, pull `@zhann/dhl-parcel` instead (or as well); it shows the same report.
+
 ## Follow a parcel
 
 The `@zhann/follow-parcel` workflow looks once, so a wrong code or postal code fails straight away,
@@ -30,7 +32,8 @@ request says who is asking: `parcel-tracker/<version> (+https://github.com/zhann
 ## Where is it now?
 
 Each parcel is a behavior named `bpost-<tracking code>`. `snapshot` looks once and prints the
-`@zhann/parcel-report` report, which every method of the behavior runs:
+`@zhann/parcel-report` report, which comes with this package as a dependency and runs after every
+method:
 
 ```bash
 swamp behavior run bpost-<tracking code> snapshot

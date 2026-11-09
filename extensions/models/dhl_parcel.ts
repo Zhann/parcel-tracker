@@ -430,7 +430,14 @@ async function setArchived(ctx: MethodContext, archived: boolean) {
  */
 export const model = {
   type: "@zhann/dhl-parcel",
-  version: "2026.11.08.1",
+  version: "2026.11.09.1",
+  upgrades: [
+    {
+      toVersion: "2026.11.09.1",
+      description: "Published as its own @zhann/dhl-parcel package; arguments unchanged.",
+      upgradeAttributes: (old: Record<string, unknown>) => old,
+    },
+  ],
   reports: ["@zhann/parcel-report"],
   globalArguments: GlobalArgsSchema,
   resources: {

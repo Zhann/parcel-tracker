@@ -38,12 +38,26 @@ swamp workflow run @zhann/follow-parcel --input code=<tracking code> --input pos
 swamp workflow run @zhann/follow-dhl-parcel --input code=<tracking number> --input label=<name>
 ```
 
+### Without this repo
+
+The behaviors are published on swamp-club as two packages, one per carrier, so you pull only the
+carrier you get parcels from:
+
+```bash
+swamp extension pull @zhann/bpost-parcel   # bpost, no account needed
+swamp extension pull @zhann/dhl-parcel     # DHL, with your own API key
+```
+
+Both bring `@zhann/parcel-report`, the parcel-at-a-glance report every method prints, as a
+dependency. Their READMEs are in [packages/](packages/).
+
 ### DHL needs an API key
 
 DHL's tracking API wants a key, free with an app at
 [developer.dhl.com](https://developer.dhl.com/api-reference/shipment-tracking)
 (add the "Shipment Tracking - Unified" API to it). Store it once in the repo's
-local vault:
+local vault (`swamp vault create local_encryption default` first, in a repo
+without a `default` vault):
 
 ```bash
 swamp vault put default DHL_API_KEY

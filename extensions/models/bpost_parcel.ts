@@ -338,7 +338,7 @@ async function setArchived(ctx: MethodContext, archived: boolean) {
  */
 export const model = {
   type: "@zhann/bpost-parcel",
-  version: "2026.11.08.2",
+  version: "2026.11.09.1",
   upgrades: [
     {
       toVersion: "2026.11.06.2",
@@ -364,6 +364,12 @@ export const model = {
       toVersion: "2026.11.08.2",
       description:
         "Sends an identifying User-Agent and honours bpost's Retry-After; arguments unchanged.",
+      upgradeAttributes: (old: Record<string, unknown>) => old,
+    },
+    {
+      toVersion: "2026.11.09.1",
+      description: "Takes the @zhann/parcel-report report from its own package, a dependency; " +
+        "arguments unchanged.",
       upgradeAttributes: (old: Record<string, unknown>) => old,
     },
   ],

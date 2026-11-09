@@ -37,7 +37,44 @@ out an allow-list: it keeps the sender's organisation name only, keeps only the
 town of each location (`addressLocality` can include a street), and cuts
 "signed for by …" from event texts.
 
+## Publishing `@zhann/dhl-parcel`
+
+Re-checked on **2026-11-09** for publishing the behavior as its own swamp-club
+package ([#3](https://github.com/zhann/parcel-tracker/issues/3)). DHL's pages answered an automated fetch with "The requested
+URL was rejected", so this rests on the 2026-11-08 reading above; nothing in it
+changed.
+
+Publishing the code is not using the API. What changes is who uses it:
+
+- **Each user brings their own key, and accepts DHL's terms themselves.** The
+  key is read from the user's own `default` vault; none ships with the package,
+  and the `apiKey` argument stays sensitive. The package README sends users to
+  developer.dhl.com to create their own app, says that is where they accept the
+  terms, and that every call counts against their key.
+- **The limits are per key, the pacing per shipment.** One shipment stays under
+  100 calls a day; a key following several at once can still reach 250. DHL
+  then answers 429, and `follow` waits for `Retry-After` (at least 5 minutes)
+  rather than retrying sooner. The README says the pacing is per shipment.
+- **The other obligations travel with the code.** The `30d` lifetime keeps
+  deleting tracking data in each user's own datastore, and the report, now in
+  `@zhann/parcel-report`, prints "Delivered by Deutsche Post DHL Group" under
+  every DHL shipment for every user. The TUI is not published; the README asks
+  that anything else showing the data carries the credit too. Own-tracking use
+  and not sharing the data are the user's to keep; the README lists them.
+- **No DHL data ships.** The package holds `dhl_parcel.ts` and the modules it
+  imports, the workflow, README and LICENSE (the dry run's file list). The
+  synthetic fixture stays in the repo.
+- **DHL's name is used descriptively.** "dhl" names what the package tracks, in
+  its name and labels; the README says it is unofficial and not affiliated with
+  DHL, as for bpost in [bpost-tos.md](bpost-tos.md).
+- **Requests identify the client, not the user.** The User-Agent names
+  `parcel-tracker/<version>` and the repository, nothing about whoever runs it.
+
 ## Open points
+
+- DHL's pages refused an automated re-read on 2026-11-09. Read the API reference
+  and developer.dhl.com's terms of use in a browser, and check that they allow a
+  published client that each user runs with their own key.
 
 - The reference page's wording was read through a summary tool. Check the
   exact attribution text, and the terms behind the app's key, against the
