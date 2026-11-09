@@ -1,6 +1,6 @@
 # Parcel tracker
 
-Swamp workflow that follows a bpost parcel to the doorstep, with a terminal view of its stops left and ETA. The datastore stays local, so parcel data never leaves this machine.
+Swamp workflow that follows a bpost (or DHL) parcel to the doorstep, with a terminal view of its stops left and ETA. The datastore stays local, so parcel data never leaves this machine.
 
 Hosted on GitHub at <https://github.com/zhann/parcel-tracker>; issues and pull
 requests live there, and `gh` works against it. Branches are named
@@ -17,11 +17,19 @@ pull request and on `main`.
 - `extensions/models/_lib/bpost.ts` — the two bpost endpoints and the
   allow-list parse. Nothing about the receiver (name, street, coordinates) is
   ever written; keep it that way, and keep fixtures scrubbed.
+- `extensions/models/dhl_parcel.ts` — the `@zhann/dhl-parcel` behavior, same
+  methods; asks DHL's tracking API with `DHL_API_KEY` from the `default` vault.
+  Not in the published manifest yet.
+- `extensions/models/_lib/dhl.ts` — DHL's endpoint and allow-list parse, and
+  pacing that keeps a new key within 250 calls a day. Same rule: nothing about
+  the receiver is written, and only the town of a location.
+- `extensions/models/_lib/status.ts` — the `status` schema both carriers write.
 - `extensions/models/_lib/pace.ts` — pace and ETA from the round's stop counts.
 - `extensions/models/_lib/format.ts` — times and words, shared by the report and the TUI.
 - `extensions/reports/parcel_report.ts` — `@zhann/parcel-report`, the parcel at a
   glance after every method; what someone with the extension and no TUI reads.
 - `workflows/workflow-follow-parcel.yaml` — snapshot, then follow.
+- `workflows/workflow-follow-dhl-parcel.yaml` — the same for DHL.
 - `tui/` — the terminal view; it only talks to swamp through the CLI.
 
 ## Validation
@@ -30,6 +38,7 @@ pull request and on `main`.
 deno task check   # fmt, lint, type-check
 deno task test    # no network
 swamp workflow validate @zhann/follow-parcel
+swamp workflow validate @zhann/follow-dhl-parcel
 ```
 
 Never point `.swamp.yaml` at a shared datastore.

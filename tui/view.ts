@@ -7,15 +7,17 @@
  *
  * @module
  */
-import type { Round, Status } from "../extensions/models/bpost_parcel.ts";
+import type { Round } from "../extensions/models/bpost_parcel.ts";
+import { CARRIER_WORD, carrierOf, type Status } from "../extensions/models/_lib/status.ts";
 import {
   clock,
   duration,
   eventStamp,
   fromNow,
   PHASE_WORD,
-  relativeDay,
+  windowText,
 } from "../extensions/models/_lib/format.ts";
+import { DHL_CREDIT } from "../extensions/reports/parcel_report.ts";
 
 export { clock, duration };
 
@@ -218,9 +220,7 @@ function detailPane(row: Row | undefined, round: Round | null, now: Date, width:
 
   out.push(field("Step", [[PHASE_WORD[s.phase]], [s.step.text ? ` — ${s.step.text}` : "", S.dim]]));
   if (s.window && s.phase !== "done") {
-    out.push(
-      field("bpost", [[`${relativeDay(s.window.day, now)} ${s.window.from}–${s.window.to}`]]),
-    );
+    out.push(field(CARRIER_WORD[carrierOf(s)], [[windowText(s.window, now)]]));
   }
   if (s.roundName) out.push(field("Round", [[s.roundName]]));
 
@@ -282,6 +282,10 @@ function detailPane(row: Row | undefined, round: Round | null, now: Date, width:
       [(e.location ?? "").padEnd(18).slice(0, 18) + "  "],
       [e.text],
     ]);
+  }
+  if (carrierOf(s) === "dhl") {
+    out.push([]);
+    out.push([[DHL_CREDIT, S.dim]]);
   }
   return out;
 }

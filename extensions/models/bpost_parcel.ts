@@ -31,6 +31,7 @@ import {
 } from "./_lib/bpost.ts";
 import { estimate, type Eta, type RoundSample, stopDurations } from "./_lib/pace.ts";
 import { brusselsDay } from "./_lib/format.ts";
+import { RoundSampleSchema, StatusSchema } from "./_lib/status.ts";
 
 /**
  * The behavior type, for queries over this behavior's data. `model.type` repeats
@@ -56,60 +57,6 @@ const GlobalArgsSchema = z.object({
 
 /** The parsed global arguments of one parcel. */
 type GlobalArgs = z.infer<typeof GlobalArgsSchema>;
-
-const EventSchema = z.object({
-  at: z.string(),
-  location: z.string().nullable(),
-  text: z.string(),
-});
-
-const RoundSampleSchema = z.object({
-  at: z.string(),
-  stops: z.number(),
-  progress: z.number().nullable(),
-  distanceKm: z.number().nullable(),
-});
-
-const PaceSchema = z.object({ p25: z.number(), p50: z.number(), p75: z.number() });
-
-const EtaSchema = z.object({
-  stops: z.number(),
-  anchor: z.string(),
-  pace: PaceSchema,
-  basis: z.enum(["live", "live+history", "history", "prior"]),
-  intervals: z.number(),
-  earliest: z.string(),
-  likely: z.string(),
-  latest: z.string(),
-});
-
-/**
- * The `status` resource: the parcel as last seen, with the round's latest
- * sample and the ETA while the round is live.
- */
-const StatusSchema = z.object({
-  itemCode: z.string(),
-  label: z.string(),
-  product: z.string().nullable(),
-  sender: z.string().nullable(),
-  weightGrams: z.number().nullable(),
-  phase: z.enum(["in_transit", "out_for_delivery", "at_pickup_point", "returning", "done"]),
-  step: z.object({
-    name: z.string().nullable(),
-    knownProcessStep: z.string().nullable(),
-    text: z.string(),
-  }),
-  window: z.object({ day: z.string(), from: z.string(), to: z.string() }).nullable(),
-  roundName: z.string().nullable(),
-  events: z.array(EventSchema),
-  round: RoundSampleSchema.nullable(),
-  eta: EtaSchema.nullable(),
-  archived: z.boolean(),
-  following: z.boolean(),
-  checkedAt: z.string(),
-  nextCheckAt: z.string().nullable(),
-  error: z.string().nullable(),
-});
 
 /** The parcel as last seen; the `status` resource's content. */
 export type Status = z.infer<typeof StatusSchema>;

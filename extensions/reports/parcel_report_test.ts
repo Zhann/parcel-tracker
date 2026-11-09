@@ -1,6 +1,12 @@
 import { assert, assertEquals, assertStringIncludes } from "jsr:@std/assert@1.0.13";
 import type { Status } from "../models/bpost_parcel.ts";
-import { EVENTS_SHOWN, type ParcelReportContext, report, summarize } from "./parcel_report.ts";
+import {
+  DHL_CREDIT,
+  EVENTS_SHOWN,
+  type ParcelReportContext,
+  report,
+  summarize,
+} from "./parcel_report.ts";
 
 const NOW = new Date("2026-11-06T10:00:00Z"); // 11:00 in Brussels
 
@@ -121,4 +127,51 @@ Deno.test("a parcel never looked at says why there is nothing to show", async ()
   assertEquals((await report.execute(context(null).ctx)).json.status, null);
   const { markdown } = await report.execute(context(null, "failed").ctx);
   assertEquals(markdown, "No parcel status: No bpost parcel 3232.\n");
+});
+
+const DHL: Status = {
+  ...OUT,
+  carrier: "dhl",
+  itemCode: "7777777770",
+  label: "Lamp",
+  product: "EXPRESS WORLDWIDE",
+  weightGrams: 1200,
+  step: {
+    name: "transit",
+    knownProcessStep: null,
+    text: "Shipment is out with courier for delivery",
+  },
+  window: { day: "2026-11-06", from: "09:00", to: "18:00" },
+  roundName: null,
+  round: null,
+  eta: null,
+};
+
+Deno.test("a DHL shipment shows DHL's window and the credit DHL asks for", () => {
+  const { markdown, json } = summarize(DHL, NOW);
+  assertStringIncludes(markdown, "## Lamp — out for delivery");
+  assertStringIncludes(markdown, "- **DHL** today 09:00–18:00");
+  assertStringIncludes(markdown, `_${DHL_CREDIT}_`);
+  for (const gone of ["**ETA**", "**Stops**", "**Van**", "**Pace**", "**bpost**"]) {
+    assert(!markdown.includes(gone), `${gone} is not shown`);
+  }
+  assertEquals(json.carrier, "dhl");
+  assertEquals(json.stopsLeft, null);
+});
+
+Deno.test("a status without a carrier is bpost's and carries no DHL credit", () => {
+  const { markdown, json } = summarize(OUT, NOW);
+  assertEquals(json.carrier, "bpost");
+  assert(!markdown.includes(DHL_CREDIT));
+});
+
+Deno.test("a single DHL time reads as a 'by' time, a bare day as the day", () => {
+  assertStringIncludes(
+    summarize({ ...DHL, window: { day: "2026-11-07", from: "12:00", to: "12:00" } }, NOW).markdown,
+    "- **DHL** tomorrow by 12:00",
+  );
+  assertStringIncludes(
+    summarize({ ...DHL, window: { day: "2026-11-09", from: "", to: "" } }, NOW).markdown,
+    "- **DHL** 09/11\n",
+  );
 });

@@ -143,3 +143,19 @@ Deno.test("archived parcels hide until asked for", () => {
   const shown = render(view({ rows, showArchived: true }), NOW, 100, 10).map(strip).join("\n");
   assert(shown.includes("Old"));
 });
+
+Deno.test("a DHL shipment shows DHL's window and the credit DHL asks for", () => {
+  const dhl = status({
+    carrier: "dhl",
+    label: "Lamp",
+    window: { day: "2026-11-06", from: "09:00", to: "18:00" },
+    roundName: null,
+    round: null,
+    eta: null,
+  });
+  const screen = render(view({ rows: [{ name: "dhl-1", status: dhl }], round: null }), NOW, 120, 30)
+    .map(strip).join("\n");
+  assert(screen.includes("DHL      today 09:00–18:00"), screen);
+  assert(screen.includes("Delivered by Deutsche Post DHL Group"));
+  assert(!screen.includes("bpost "));
+});

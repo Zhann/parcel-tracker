@@ -2,20 +2,21 @@
  * A parcel at a glance: where it is, how many stops are left and when it
  * should arrive, in Brussels time and in minutes from now.
  *
- * The `@zhann/bpost-parcel` behavior runs it after every method, so
- * `swamp behavior run bpost-<code> snapshot` looks once and prints it; the
- * stored copy is `swamp report get @zhann/parcel-report --behavior bpost-<code>`.
+ * The `@zhann/bpost-parcel` and `@zhann/dhl-parcel` behaviors run it after
+ * every method, so `swamp behavior run bpost-<code> snapshot` looks once and
+ * prints it; the stored copy is
+ * `swamp report get @zhann/parcel-report --behavior bpost-<code>`.
  *
  * @module
  */
-import type { Status } from "../models/bpost_parcel.ts";
+import { CARRIER_WORD, carrierOf, type Status } from "../models/_lib/status.ts";
 import {
   clock,
   duration,
   eventStamp,
   fromNow,
   PHASE_WORD,
-  relativeDay,
+  windowText,
 } from "../models/_lib/format.ts";
 
 /** What the report returns: markdown to read, JSON to script against. */
@@ -39,6 +40,9 @@ export interface ParcelReportContext {
     ): Promise<Uint8Array | null>;
   };
 }
+
+/** The credit DHL's terms ask for wherever its tracking data is shown. */
+export const DHL_CREDIT = "Delivered by Deutsche Post DHL Group";
 
 /** Timeline events shown; the full list is in the `status` resource. */
 export const EVENTS_SHOWN = 4;
@@ -97,7 +101,7 @@ export function summarize(s: Status | null, now: Date, failure?: string): Report
     );
   }
   if (s.window && s.phase !== "done") {
-    lines.push(`- **bpost** ${relativeDay(s.window.day, now)} ${s.window.from}–${s.window.to}`);
+    lines.push(`- **${CARRIER_WORD[carrierOf(s)]}** ${windowText(s.window, now)}`);
   }
   const follow = s.following && s.nextCheckAt
     ? `following, next look ${clock(s.nextCheckAt)}`
@@ -115,10 +119,15 @@ export function summarize(s: Status | null, now: Date, failure?: string): Report
       lines.push(`- ${eventStamp(e.at)} · ${where}${e.text}`);
     }
   }
+  if (carrierOf(s) === "dhl") {
+    lines.push("");
+    lines.push(`_${DHL_CREDIT}_`);
+  }
 
   return {
     markdown: lines.join("\n") + "\n",
     json: {
+      carrier: carrierOf(s),
       itemCode: s.itemCode,
       title: title(s),
       phase: s.phase,
