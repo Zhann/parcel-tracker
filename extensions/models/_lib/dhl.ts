@@ -21,7 +21,8 @@
  * @module
  */
 import { brusselsDay, clock } from "./format.ts";
-import { parseRetryAfter, type Phase } from "./bpost.ts";
+import { parseRetryAfter } from "./http.ts";
+import type { Phase } from "./status.ts";
 
 export { parseRetryAfter };
 export type { Phase };

@@ -20,25 +20,14 @@
  * @module
  */
 
+import { parseRetryAfter } from "./http.ts";
+import type { Phase } from "./status.ts";
+
+export type { Phase };
+
 export const BPOST_TRACK_API = "https://track.bpost.cloud/track";
 
 export type Language = "EN" | "NL" | "FR" | "DE";
-
-/**
- * Where the parcel is, in the terms the follow loop paces itself by.
- *
- * - `in_transit`: announced, sorted, in the network.
- * - `out_for_delivery`: on a postman's round today (live once stops show).
- * - `at_pickup_point`: waiting in a post point, locker or office.
- * - `returning`: on its way back to the sender.
- * - `done`: delivered, picked up, or back at the sender.
- */
-export type Phase =
-  | "in_transit"
-  | "out_for_delivery"
-  | "at_pickup_point"
-  | "returning"
-  | "done";
 
 export interface TrackedEvent {
   /** Brussels local time, `YYYY-MM-DDTHH:MM`. */
@@ -104,20 +93,6 @@ export class HttpError extends Error {
     super(`bpost answered HTTP ${status} for ${path}`);
     this.name = "HttpError";
   }
-}
-
-/**
- * Seconds a `Retry-After` value asks for: either delay-seconds or an HTTP
- * date (RFC 9110 §10.2.3). Null when absent or unreadable; never negative.
- */
-export function parseRetryAfter(value: string | null, now: Date = new Date()): number | null {
-  if (value == null) return null;
-  const v = value.trim();
-  if (/^\d+$/.test(v)) return Number(v);
-  if (!/^[A-Za-z]{3},? /.test(v)) return null; // HTTP dates start with the weekday
-  const at = Date.parse(v);
-  if (Number.isNaN(at)) return null;
-  return Math.max(0, Math.ceil((at - now.getTime()) / 1000));
 }
 
 // deno-lint-ignore no-explicit-any
