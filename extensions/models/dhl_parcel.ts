@@ -203,8 +203,8 @@ export class QuotaSpent extends Error {
  */
 export async function readQuota(ctx: MethodContext, now: Date): Promise<Quota> {
   const [counts, statuses] = await Promise.all([
-    ctx.queryData(`modelType == "${BEHAVIOR_TYPE}" && specName == "calls"`),
-    ctx.queryData(`modelType == "${BEHAVIOR_TYPE}" && specName == "status"`),
+    ctx.queryData(`modelType == "${BEHAVIOR_TYPE}" && specName == "${CALLS}"`),
+    ctx.queryData(`modelType == "${BEHAVIOR_TYPE}" && specName == "${STATUS}"`),
   ]);
   const others = statuses.filter((r) => {
     const s = r.attributes as Partial<Status> | null;
@@ -332,9 +332,19 @@ export async function follow(
 
   // The workflow's snapshot looked a moment ago; keep to DHL's one call per 5 s.
   const sinceLast = last ? (deps.now().getTime() - Date.parse(last.checkedAt)) / 1000 : Infinity;
-  if (sinceLast < MIN_GAP_SECONDS) {
-    await deps.sleep(Math.ceil((MIN_GAP_SECONDS - sinceLast) * 1000), ctx.signal);
+  const gapMs = sinceLast < MIN_GAP_SECONDS ? Math.ceil((MIN_GAP_SECONDS - sinceLast) * 1000) : 0;
+
+  // Say it is following before the first look, so follows started together count each
+  // other (see readQuota). A shipment with no status yet has nothing to say it on.
+  if (last) {
+    last = {
+      ...last,
+      following: true,
+      nextCheckAt: new Date(deps.now().getTime() + gapMs).toISOString(),
+    };
+    handle = await ctx.writeResource("status", STATUS, last);
   }
+  if (gapMs > 0) await deps.sleep(gapMs, ctx.signal);
 
   while (true) {
     let waitSeconds: number | null;
@@ -378,9 +388,10 @@ export async function follow(
           wait: waitSeconds,
         });
         if (last) {
-          last = fatal ? { ...last, error, following: false, nextCheckAt: null } : {
+          last = fatal ? { ...last, error, waiting: null, following: false, nextCheckAt: null } : {
             ...last,
             error,
+            waiting: null,
             following: true,
             nextCheckAt: new Date(deps.now().getTime() + waitSeconds * 1000).toISOString(),
           };
@@ -404,6 +415,7 @@ export async function follow(
   }
   return handle ? [handle] : [];
 }
+
 async function setArchived(ctx: MethodContext, archived: boolean) {
   const status = await ctx.readResource(STATUS) as Status | null;
   if (!status) throw new Error("no status yet: run snapshot or follow first");

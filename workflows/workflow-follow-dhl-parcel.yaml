@@ -3,9 +3,10 @@ name: "@zhann/follow-dhl-parcel"
 description: >-
   Follow one DHL shipment until it is delivered: look once, so a wrong number
   or a rejected API key fails at once, then keep looking, paced by where the
-  shipment is and by the calls the key has left today. Asks DHL's Shipment Tracking - Unified API with the key in the
-  default vault's DHL_API_KEY. The run lasts as long as the shipment's journey
-  (maxHours at most); the TUI shows it while it runs.
+  shipment is and by the calls the key has left today. Asks DHL's Shipment
+  Tracking - Unified API with the key in the default vault's DHL_API_KEY. The
+  run lasts as long as the shipment's journey (maxHours at most); the TUI
+  shows it while it runs.
 tags:
   carrier: dhl
 vaults: [default]

@@ -354,6 +354,33 @@ Deno.test("a follow that stopped without saying so takes no share", async () => 
   assertEquals(sleeps, [900]);
 });
 
+Deno.test("follows started together count each other from their first look", async () => {
+  const world = sharedWorld(MORNING);
+  const datastore: Datastore = new Map();
+  seed(datastore, "dhl-other", "calls", { day: TODAY, count: 246 });
+  const follows = [];
+  for (let i = 0; i < 3; i++) {
+    const { ctx } = fakeContext({ datastore, id: `dhl-${i}` });
+    const deps = world.deps(() => OUT);
+    follows.push(snapshot(ctx, deps).then(() => follow(ctx, deps, 1)));
+  }
+  await world.run(follows);
+  // The three snapshots make 249. One call is left, and three follows that would each take
+  // it if they did not see each other: two hold back, and the last, then alone, takes it.
+  assertEquals(246 + world.calls.get(TODAY)!, 250);
+});
+
+Deno.test("a look that fails after the wait shows its error, no longer the wait", async () => {
+  const { ctx, store, datastore } = fakeContext();
+  const { deps } = fakeWorld([OUT, "fail", DELIVERED], MORNING);
+  await snapshot(ctx, deps);
+  seed(datastore, "dhl-other", "calls", { day: TODAY, count: 249 });
+  await follow(ctx, deps, 240);
+  const failed = (store.get("status") as Status[]).find((s) => s.error)!;
+  assertEquals(failed.error, "DHL answered HTTP 502");
+  assertEquals(failed.waiting, null);
+});
+
 Deno.test("a spent budget shows as waiting for tomorrow's quota, not as an error", async () => {
   const { ctx, store, datastore } = fakeContext();
   const { deps, sleeps, urls } = fakeWorld([OUT, DELIVERED], MORNING);
@@ -363,7 +390,8 @@ Deno.test("a spent budget shows as waiting for tomorrow's quota, not as an error
 
   // Six seconds after the snapshot, then to a minute past Brussels midnight.
   assertEquals(sleeps, [MIN_GAP_SECONDS, 14 * 3600 - MIN_GAP_SECONDS + 60]);
-  const [, waiting, delivered] = store.get("status") as Status[];
+  // The snapshot's status, the follow saying it started, the wait, the delivery.
+  const [, , waiting, delivered] = store.get("status") as Status[];
   assertEquals(waiting.waiting, WAITING_FOR_QUOTA);
   assertEquals(waiting.error, null);
   assertEquals(waiting.following, true);
