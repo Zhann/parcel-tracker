@@ -56,11 +56,14 @@ Publishing the code is not using the API. What changes is who uses it:
   sensitive. The package README sends users to developer.dhl.com for their own
   app, says that is where they accept the terms, and tells them not to share
   the key.
-- **The limits are per key, the pacing per shipment.** "Each account contains a
-  limit for API calls." One shipment stays under 100 calls a day; a key
-  following several at once can still reach 250. DHL then answers 429, and
-  `follow` waits for `Retry-After` (at least 5 minutes) rather than retrying
-  sooner; it never tries to get around a limit. The README says so.
+- **The limits are per key, and so is the count.** "Each account contains a
+  limit for API calls." Every look is counted against `dailyBudget` (250) across
+  the DHL shipments in the user's own repo (see the table above), so a key used
+  only there stays within its day. The count cannot see calls the same key
+  makes from another repo or machine, nor two snapshots racing for the last
+  call; DHL's 429 is then the backstop, and `follow` waits for `Retry-After`
+  (at least 5 minutes) rather than retrying sooner. It never tries to get
+  around a limit. The README says all of this.
 - **The other obligations travel with the code.** The `30d` lifetime keeps
   deleting tracking data in each user's own datastore, and the report, now in
   `@zhann/parcel-report`, prints "Delivered by Deutsche Post DHL Group" under

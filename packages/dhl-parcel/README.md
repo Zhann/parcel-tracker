@@ -44,13 +44,22 @@ language; out for delivery and pickup points are only recognised in English.
 
 A new key allows 250 calls a day and one every 5 seconds. `follow` looks every 30 minutes in
 transit, every 15 once the shipment is out for delivery and every 4 hours while it waits at a pickup
-point, so one shipment stays under 100 calls a day. The limit is your key's and the pacing is per
-shipment: several followed at once share the 250, and when DHL says the key has had enough, `follow`
-waits as long as DHL asks. It leaves at least 6 seconds after the workflow's first look, tries a
-failed look again 5 minutes later (or after DHL's `Retry-After`, when that is longer), and stops on
-a number DHL does not know, a request DHL refuses (a rejected key, a malformed number), or 30 failed
-looks in a row. The run lasts as long as the shipment's journey (`maxHours`, 240 by default). Every
-request says who is asking: `parcel-tracker/<version> (+https://github.com/zhann/parcel-tracker)`.
+point, so one shipment stays under 100 calls a day.
+
+The 250 are your key's, for all its shipments together, so every look (a snapshot's and a retry's
+too) is counted per Brussels day across the repo's DHL shipments. Shipments followed at the same
+time look less often as the day's calls run low; once they are spent, each shows "waiting for
+tomorrow's DHL quota" and looks again after midnight, Brussels time. A key with more calls a day
+takes `--input dailyBudget=<calls>`; give every shipment on one key the same one. The count only
+sees this repo: calls the key makes anywhere else are not in it, one more reason to keep the key to
+yourself. It is not locked either, so two snapshots in the same moment can both take the day's last
+call; DHL's own 429 is then waited out.
+
+Each follow leaves at least 6 seconds after the workflow's first look, tries a failed look again 5
+minutes later (or after DHL's `Retry-After`, when that is longer), and stops on a number DHL does
+not know, a request DHL refuses (a rejected key, a malformed number), or 30 failed looks in a row.
+The run lasts as long as the shipment's journey (`maxHours`, 240 by default). Every request says who
+is asking: `parcel-tracker/<version> (+https://github.com/zhann/parcel-tracker)`.
 
 ## Where is it now?
 

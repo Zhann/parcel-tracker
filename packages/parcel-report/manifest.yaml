@@ -1,6 +1,6 @@
 manifestVersion: 1
 name: "@zhann/parcel-report"
-version: "2026.11.09.1"
+version: "2026.11.09.2"
 license: MIT
 repository: "https://github.com/zhann/parcel-tracker"
 description: "A parcel at a glance after every method of @zhann/bpost-parcel or @zhann/dhl-parcel: step, stops left, ETA and the latest events."
