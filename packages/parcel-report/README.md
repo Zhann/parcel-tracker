@@ -7,6 +7,9 @@ the latest events.
 Both carrier packages depend on this one, so pulling either brings it along; there is nothing to
 configure. It reads the behavior's `status` resource and asks nothing of the network.
 
+Upgrading a carrier by name does not upgrade this report with it. `swamp extension update`, with no
+name, upgrades both.
+
 ```bash
 swamp behavior run bpost-<tracking code> snapshot     # prints the report
 swamp report get @zhann/parcel-report --behavior bpost-<tracking code> --markdown

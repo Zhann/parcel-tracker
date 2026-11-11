@@ -174,6 +174,30 @@ Deno.test("a carrier package's code imports nothing named for another carrier", 
   }
 });
 
+/**
+ * A report's description as the registry lists it: the first string literal
+ * after `description:` in the source, so a `"…" + "…"` loses everything past
+ * the first `+`.
+ */
+function listedDescription(source: string): string | undefined {
+  const literal = source.match(/\bdescription:\s*("(?:[^"\\\n]|\\.)*")/)?.[1];
+  return literal === undefined ? undefined : JSON.parse(literal);
+}
+
+Deno.test("swamp-club lists each report's description in full", async () => {
+  for (const p of packages) {
+    for (const file of p.manifest.reports ?? []) {
+      const url = new URL(`extensions/reports/${file}`, ROOT);
+      const { report } = await import(url.href);
+      const source = await Deno.readTextFile(url);
+      const start = source.indexOf("export const report");
+      assert(start >= 0, `${file} exports no report`);
+      const body = source.slice(start);
+      assertEquals(listedDescription(body), report.description, `${p.manifest.name}: ${file}`);
+    }
+  }
+});
+
 Deno.test("a carrier package ships only its own behavior, named as the package", () => {
   for (const p of packages) {
     for (const m of p.models) assertEquals(m.type, p.manifest.name);

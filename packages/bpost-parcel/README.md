@@ -71,6 +71,19 @@ counted from the last drop. Until today's round has eight durations, earlier rou
 round name fill in; with fewer than three, a fixed guess of two, three and five minutes a stop
 stands in, and the ETA's `basis` says which it used.
 
+## Upgrade
+
+Run `swamp extension update` with no name. It updates every extension the repo has pulled, so this
+package and `@zhann/parcel-report` move up together, and it asks nothing:
+
+```bash
+swamp extension update --check   # what is behind
+swamp extension update
+```
+
+Pulling or updating `@zhann/bpost-parcel` by name upgrades this package only. The report stays at
+the version it had until it is pulled or updated by its own name.
+
 ## Keep the datastore local
 
 The data says where you live and when you are home. Keep the repo on its local datastore rather than

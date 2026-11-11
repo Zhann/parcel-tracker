@@ -51,6 +51,9 @@ swamp extension pull @zhann/dhl-parcel     # DHL, with your own API key
 Both bring `@zhann/parcel-report`, the parcel-at-a-glance report every method prints, as a
 dependency. Their READMEs are in [packages/](packages/).
 
+To upgrade, run `swamp extension update` with no name: it updates the carrier and the report
+together. Pulling or updating a carrier by name leaves the report at the version it had.
+
 ### DHL needs an API key
 
 DHL's tracking API wants a key, free with an app at
