@@ -1,6 +1,6 @@
 manifestVersion: 1
 name: "@zhann/dhl-parcel"
-version: "2026.11.09.2"
+version: "2026.11.11.1"
 license: MIT
 repository: "https://github.com/zhann/parcel-tracker"
 description: "A DHL shipment followed until it is delivered, by DHL's own estimate. Needs your own DHL API key."

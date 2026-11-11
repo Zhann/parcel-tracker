@@ -159,8 +159,9 @@ export async function latestStatus(ctx: ParcelReportContext): Promise<Status | n
 /** The `@zhann/parcel-report` report, run after every method of the behavior. */
 export const report = {
   name: "@zhann/parcel-report",
-  description: "The parcel at a glance: step, stops left, ETA in local time and minutes, " +
-    "and the latest events.",
+  // One literal: the registry lists only the first of `"…" + "…"`.
+  description:
+    "The parcel at a glance: step, stops left, ETA in local time and minutes, and the latest events.",
   scope: "method" as const,
   labels: ["parcel"],
   execute: async (ctx: ParcelReportContext): Promise<ReportResult> => {

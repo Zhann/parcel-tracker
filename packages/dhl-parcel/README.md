@@ -114,6 +114,19 @@ without "signed for by …".
 
 This is a summary, not legal advice: the terms you accepted with your key are the ones that count.
 
+## Upgrade
+
+Run `swamp extension update` with no name. It updates every extension the repo has pulled, so this
+package and `@zhann/parcel-report` move up together, and it asks nothing:
+
+```bash
+swamp extension update --check   # what is behind
+swamp extension update
+```
+
+Pulling or updating `@zhann/dhl-parcel` by name upgrades this package only. The report stays at the
+version it had until it is pulled or updated by its own name.
+
 ## Keep the datastore local
 
 The data says where you live and when you are home. Keep the repo on its local datastore rather than
