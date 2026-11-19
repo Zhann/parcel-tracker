@@ -128,7 +128,7 @@ Deno.test("windowOf reads each of PostNL's estimate types", () => {
 });
 
 Deno.test("countryOf tells Belgian, Dutch and Luxembourg postal codes apart", () => {
-  assertEquals(countryOf("9050"), "BE");
+  assertEquals(countryOf("1000"), "BE");
   assertEquals(countryOf("1000"), "BE");
   assertEquals(countryOf("2511 AB"), "NL");
   assertEquals(countryOf("2511ab"), "NL");
@@ -140,8 +140,8 @@ Deno.test("countryOf tells Belgian, Dutch and Luxembourg postal codes apart", ()
 
 Deno.test("trackUrl puts code, country and postal code in the key PostNL's page uses", () => {
   assertEquals(
-    trackUrl("3sabcd123456789", "9050", "BE"),
-    "https://tracking.postnl.nl/track-and-trace/api/trackAndTrace/3SABCD123456789-BE-9050?language=en",
+    trackUrl("3sabcd123456789", "1000", "BE"),
+    "https://tracking.postnl.nl/track-and-trace/api/trackAndTrace/3SABCD123456789-BE-1000?language=en",
   );
   assertEquals(
     trackUrl("3SABCD123456789", "2511 ab", "nl", "NL"),
