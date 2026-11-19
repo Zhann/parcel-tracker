@@ -73,8 +73,8 @@ the `README.md` and `LICENSE` beside it:
 - `@zhann/bpost-parcel` — the bpost behavior and `@zhann/follow-parcel`.
 - `@zhann/dhl-parcel` — the DHL behavior and `@zhann/follow-dhl-parcel`.
 - `@zhann/postnl-parcel` — the PostNL behavior and `@zhann/follow-postnl-parcel`.
-  Not pushed yet: PostNL's terms ask written consent for a "directe koppeling of
-  gateway" to its data (docs/research/postnl-tos.md); that is the owner's call.
+  PostNL's terms allow personal use only, and the README says so
+  (docs/research/postnl-tos.md).
 
 Every carrier package lists `@zhann/parcel-report` under `dependencies`, and
 none brings another carrier. Push `@zhann/parcel-report` first when it

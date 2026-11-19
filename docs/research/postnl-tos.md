@@ -19,12 +19,15 @@ All pages were fetched on **2026-11-19**. PostNL says it may change its terms
 - **Passing the data on is forbidden**: "Het is niet toegestaan de data te
   verhandelen, te reproduceren of anderszins ter beschikking te stellen aan
   derden."
-- **Publishing the extension is grey, leaning risky.** The data terms forbid,
-  without PostNL's prior written permission, making "een directe koppeling of
-  gateway" between the data on the site and other websites. A package each
-  user runs for their own parcels is not obviously a gateway between sites,
-  but it is a direct link to PostNL's data that PostNL did not sanction.
-  Publishing is the owner's call; asking PostNL first is the clean route.
+- **Publishing the extension is acceptable; the owner published it.** The
+  data terms forbid passing the *data* on, and the package holds none: its
+  fixture is scrubbed and each user fetches only their own parcels, which is
+  their own "persoonlijk gebruik". The clause that needs PostNL's prior
+  written permission is about "een directe koppeling of gateway" between the
+  data on the site and other websites, that is, another site showing PostNL's
+  data. A tool each user runs on their own machine, writing to their own
+  datastore, is not that. What is left is practical: PostNL can block the
+  client (clause 5) or ask for the package to be taken down.
 - **Company or commercial use** is allowed only as "strikt intern gebruik
   binnen uw onderneming". Anything sold, or shown to customers, falls under
   the ban on making the data available to third parties.
@@ -140,13 +143,13 @@ receiver to follow their own parcel by machine.
 |---|---|---|---|
 | **1. Personal use** | "persoonlijk gebruik" | — | robots.txt disallows the path for crawlers |
 | **2. Internal company use** | "strikt intern gebruik binnen uw onderneming" | — | GDPR household exemption no longer applies |
-| **3. Publish `@zhann/postnl-parcel`** | — | — | "directe koppeling of gateway" without written consent; robots.txt |
+| **3. Publish `@zhann/postnl-parcel`** | each user's own "persoonlijk gebruik"; no data in the package | — | robots.txt; PostNL may block the client or ask for a takedown |
 | **4. Share data, sell, customer-facing** | — | "verhandelen, reproduceren of … ter beschikking stellen aan derden" | — |
 
-## If you publish anyway, reduce exposure
+## Keeping it on the right side
 
 - Keep the cadence and the stop on delivery and on unknown parcels.
 - Keep the allow-list; never fetch the signature.
 - Say in the README that it is unofficial and for your own parcels only, and
   that the data may not be passed on. (Done.)
-- Better still, ask PostNL for written permission first.
+- If PostNL objects, deprecate the package and stop.
