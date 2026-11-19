@@ -52,7 +52,7 @@ jobs:
         task:
           type: behavior
           behaviorType: "@zhann/dhl-parcel"
-          behaviorName: dhl-${{ inputs.code }}
+          behaviorName: dhl-${{ inputs.code.lowerAscii() }}
           methodName: snapshot
           globalArgs:
             trackingNumber: ${{ inputs.code }}
@@ -68,7 +68,7 @@ jobs:
         task:
           type: behavior
           behaviorType: "@zhann/dhl-parcel"
-          behaviorName: dhl-${{ inputs.code }}
+          behaviorName: dhl-${{ inputs.code.lowerAscii() }}
           methodName: follow
           globalArgs:
             trackingNumber: ${{ inputs.code }}

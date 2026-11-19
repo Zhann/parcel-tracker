@@ -32,9 +32,9 @@ request says who is asking: `parcel-tracker/<version> (+https://github.com/zhann
 
 ## Where is it now?
 
-Each parcel is a behavior named `bpost-<tracking code>`. `snapshot` looks once and prints the
-`@zhann/parcel-report` report, which comes with this package as a dependency and runs after every
-method:
+Each parcel is a behavior named `bpost-<tracking code>`, in lower case. `snapshot` looks once and
+prints the `@zhann/parcel-report` report, which comes with this package as a dependency and runs
+after every method:
 
 ```bash
 swamp behavior run bpost-<tracking code> snapshot

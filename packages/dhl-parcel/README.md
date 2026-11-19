@@ -63,9 +63,9 @@ is asking: `parcel-tracker/<version> (+https://github.com/zhann/parcel-tracker)`
 
 ## Where is it now?
 
-Each shipment is a behavior named `dhl-<tracking number>`. `snapshot` looks once and prints the
-`@zhann/parcel-report` report, which comes with this package as a dependency and runs after every
-method:
+Each shipment is a behavior named `dhl-<tracking number>`, in lower case. `snapshot` looks once and
+prints the `@zhann/parcel-report` report, which comes with this package as a dependency and runs
+after every method:
 
 ```bash
 swamp behavior run dhl-<tracking number> snapshot
