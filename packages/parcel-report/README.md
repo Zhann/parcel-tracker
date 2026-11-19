@@ -1,11 +1,11 @@
 # @zhann/parcel-report
 
-The parcel at a glance, after every method of a `@zhann/bpost-parcel` or `@zhann/dhl-parcel`
-behavior: the step, the carrier's window, the stops left and ETA while a bpost round is live, and
-the latest events.
+The parcel at a glance, after every method of a `@zhann/bpost-parcel`, `@zhann/dhl-parcel` or
+`@zhann/postnl-parcel` behavior: the step, the carrier's window, the stops left and ETA while a
+bpost round is live, and the latest events.
 
-Both carrier packages depend on this one, so pulling either brings it along; there is nothing to
-configure. It reads the behavior's `status` resource and asks nothing of the network.
+Every carrier package depends on this one, so pulling any of them brings it along; there is nothing
+to configure. It reads the behavior's `status` resource and asks nothing of the network.
 
 Upgrading a carrier by name does not upgrade this report with it. `swamp extension update`, with no
 name, upgrades both.

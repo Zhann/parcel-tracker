@@ -2,10 +2,11 @@
 
 # Parcel tracker
 
-Swamp workflow that follows a bpost parcel to the doorstep, with a terminal view of its stops left and ETA. It follows DHL shipments too, by DHL's own estimate. The datastore stays local, so parcel data never leaves this machine.
+Swamp workflow that follows a bpost parcel to the doorstep, with a terminal view of its stops left and ETA. It follows DHL shipments and PostNL parcels too, by the carrier's own estimate. The datastore stays local, so parcel data never leaves this machine.
 
-Unofficial: not made by, endorsed by or affiliated with bpost or DHL. It is meant for following your
-own parcels, at the same pace bpost's own tracking page looks, and within DHL's API limits.
+Unofficial: not made by, endorsed by or affiliated with bpost, DHL or PostNL. It is meant for
+following your own parcels, at the same pace bpost's own tracking page looks, within DHL's API
+limits, and as PostNL's terms allow for personal use.
 
 ```text
  Parcels                                                                   11:30
@@ -30,25 +31,30 @@ deno task tui                       # PARCEL_POSTCODE=9050 pre-fills the postal 
 
 `a` adds a parcel by starting its carrier's follow workflow in the background; it
 keeps running after the TUI quits. A 10-digit DHL Express waybill, or a DHL
-`JJD…`/`JVGL…` number, is followed with DHL and skips the postal code; any other
-code with bpost. Without the TUI:
+`JJD…`/`JVGL…` number, is followed with DHL and skips the postal code; a `3S…`
+barcode with PostNL, which reads the country from the postal code (`1234 AB` is
+NL, `1234` BE, `L-1234` LU); any other code with bpost. Without the TUI:
 
 ```bash
 swamp workflow run @zhann/follow-parcel --input code=<tracking code> --input postcode=<postal code> --input label=<name>
 swamp workflow run @zhann/follow-dhl-parcel --input code=<tracking number> --input label=<name>
+swamp workflow run @zhann/follow-postnl-parcel --input code=<barcode> --input postcode=<postal code> --input label=<name>
 ```
+
+A PostNL parcel to any other country takes `--input country=<two letters>` too.
 
 ### Without this repo
 
-The behaviors are published on swamp-club as two packages, one per carrier, so you pull only the
-carrier you get parcels from:
+The behaviors are published on swamp-club as one package per carrier, so you pull only the
+carriers you get parcels from:
 
 ```bash
 swamp extension pull @zhann/bpost-parcel   # bpost, no account needed
 swamp extension pull @zhann/dhl-parcel     # DHL, with your own API key
+swamp extension pull @zhann/postnl-parcel  # PostNL, no account needed
 ```
 
-Both bring `@zhann/parcel-report`, the parcel-at-a-glance report every method prints, as a
+Each brings `@zhann/parcel-report`, the parcel-at-a-glance report every method prints, as a
 dependency. Their READMEs are in [packages/](packages/).
 
 To upgrade, run `swamp extension update` with no name: it updates the carrier and the report
@@ -97,3 +103,12 @@ takes `--input dailyBudget=<calls>`. As DHL's terms ask, its status expires 30 d
 look, and every DHL shipment shows "Delivered by Deutsche Post DHL Group". The
 parse keeps no names, no address, and no street inside a location. See
 [docs/research/dhl-tos.md](docs/research/dhl-tos.md).
+
+The `@zhann/postnl-parcel` behavior reads the endpoint PostNL's own tracking
+page uses, which answers only for the barcode with the delivery address's
+country and postal code. It shows PostNL's own window: `follow` looks every 30
+minutes in transit, every 10 once the parcel is on its way to the address, and
+hourly at a pickup point. The parse keeps the sender's company name and none of
+the receiver's name, street, or e-mail and phone hashes. PostNL's terms allow
+personal use and forbid passing the data on; see
+[docs/research/postnl-tos.md](docs/research/postnl-tos.md).

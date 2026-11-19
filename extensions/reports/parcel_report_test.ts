@@ -190,3 +190,30 @@ Deno.test("a single DHL time reads as a 'by' time, a bare day as the day", () =>
     "- **DHL** 09/11\n",
   );
 });
+
+const POSTNL: Status = {
+  ...DHL,
+  carrier: "postnl",
+  itemCode: "3SABCD123456789",
+  label: "Tickets",
+  product: "Parcel",
+  weightGrams: 240,
+  phase: "in_transit",
+  step: { name: "InTransit", knownProcessStep: "B01", text: "Shipment received by PostNL" },
+  window: { day: "2026-11-06", from: "", to: "" },
+};
+
+Deno.test("a PostNL parcel shows PostNL's window, and no DHL credit", () => {
+  const { markdown, json } = summarize(POSTNL, NOW);
+  assertStringIncludes(markdown, "## Tickets — in transit");
+  assertStringIncludes(markdown, "- **PostNL** today\n");
+  assert(!markdown.includes(DHL_CREDIT));
+  assertEquals(json.carrier, "postnl");
+});
+
+Deno.test("a window with only a start reads as a 'from' time", () => {
+  assertStringIncludes(
+    summarize({ ...POSTNL, window: { day: "2026-11-06", from: "17:00", to: "" } }, NOW).markdown,
+    "- **PostNL** today from 17:00",
+  );
+});

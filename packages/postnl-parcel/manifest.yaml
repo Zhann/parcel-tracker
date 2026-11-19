@@ -1,0 +1,20 @@
+manifestVersion: 1
+name: "@zhann/postnl-parcel"
+version: "2026.11.19.1"
+license: MIT
+repository: "https://github.com/zhann/parcel-tracker"
+description: "A PostNL parcel followed until it is delivered or picked up, by PostNL's own window. No account needed."
+labels:
+  - postnl
+  - parcel
+  - tracking
+
+models:
+  - postnl_parcel.ts
+workflows:
+  - workflow-follow-postnl-parcel.yaml
+dependencies:
+  - "@zhann/parcel-report"
+additionalFiles:
+  - README.md
+  - LICENSE

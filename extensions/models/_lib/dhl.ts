@@ -20,11 +20,11 @@
  *
  * @module
  */
-import { brusselsDay, clock } from "./format.ts";
+import { localStamp } from "./format.ts";
 import { parseRetryAfter } from "./http.ts";
 import type { Phase } from "./status.ts";
 
-export { parseRetryAfter };
+export { localStamp, parseRetryAfter };
 export type { Phase };
 
 export const DHL_TRACK_API = "https://api-eu.dhl.com/track/shipments";
@@ -139,27 +139,6 @@ export function townOf(location: Json): string | null {
   if (typeof raw !== "string") return null;
   const town = raw.replace(/,\s*THE\s*$/i, "").split(",").at(-1)!.trim();
   return town || null;
-}
-
-const STAMP = /^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2})(?::\d{2}(?:\.\d+)?)?(Z|[+-]\d{2}:?\d{2})?$/;
-
-/**
- * A DHL timestamp as a Brussels day and `HH:MM`. One without a zone is the
- * event's local time and is kept as it is. `midnight` is true when the
- * timestamp is 00:00 in its own zone, which DHL uses for a day with no time.
- */
-export function localStamp(
-  raw: unknown,
-): { day: string; time: string; date: string; midnight: boolean } | null {
-  if (typeof raw !== "string") return null;
-  const m = STAMP.exec(raw.trim());
-  if (!m) return null;
-  const [, date, time, zone] = m;
-  const midnight = time === "00:00";
-  if (!zone) return { day: date, time, date, midnight };
-  const at = new Date(raw);
-  if (Number.isNaN(at.getTime())) return null;
-  return { day: brusselsDay(at), time: clock(at.toISOString()), date, midnight };
 }
 
 /** DHL's estimate as a window: its time frame when it gives one, else its ETA. */

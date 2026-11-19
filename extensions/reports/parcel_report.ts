@@ -2,10 +2,10 @@
  * A parcel at a glance: where it is, how many stops are left and when it
  * should arrive, in Brussels time and in minutes from now.
  *
- * The `@zhann/bpost-parcel` and `@zhann/dhl-parcel` behaviors run it after
- * every method, so `swamp behavior run bpost-<code> snapshot` looks once and
- * prints it; the stored copy is
- * `swamp report get @zhann/parcel-report --behavior bpost-<code>`.
+ * The `@zhann/bpost-parcel`, `@zhann/dhl-parcel` and `@zhann/postnl-parcel`
+ * behaviors run it after every method, so
+ * `swamp behavior run bpost-<code> snapshot` looks once and prints it; the
+ * stored copy is `swamp report get @zhann/parcel-report --behavior bpost-<code>`.
  *
  * @module
  */

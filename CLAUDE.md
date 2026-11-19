@@ -1,6 +1,6 @@
 # Parcel tracker
 
-Swamp workflow that follows a bpost (or DHL) parcel to the doorstep, with a terminal view of its stops left and ETA. The datastore stays local, so parcel data never leaves this machine.
+Swamp workflow that follows a bpost (or DHL, or PostNL) parcel to the doorstep, with a terminal view of its stops left and ETA. The datastore stays local, so parcel data never leaves this machine.
 
 Hosted on GitHub at <https://github.com/zhann/parcel-tracker>; issues and pull
 requests live there, and `gh` works against it. Branches are named
@@ -22,22 +22,29 @@ pull request and on `main`.
 - `extensions/models/_lib/dhl.ts` — DHL's endpoint and allow-list parse, and
   one shipment's pace by phase. Same rule: nothing about the receiver is
   written, and only the town of a location.
+- `extensions/models/postnl_parcel.ts` — the `@zhann/postnl-parcel` behavior,
+  same methods; no key, but PostNL answers only for barcode, country and postal
+  code, and the country is read from the postal code's shape when it can be.
+- `extensions/models/_lib/postnl.ts` — the endpoint PostNL's tracking page
+  uses, the allow-list parse and the pace by phase. Same rule: nothing about the
+  receiver is written (not even the e-mail and phone hashes), and of the sender
+  only its company name.
 - `extensions/models/_lib/quota.ts` — the DHL key's calls a day (`dailyBudget`,
   250), shared by all DHL shipments: every look is counted in its behavior's
   `calls` resource, follows stretch their pace to share what is left, and none
   looks once it is spent. Counts are not locked: follows that look in the same
   moment are covered, two snapshots racing for the day's last call are not.
-- `extensions/models/_lib/status.ts` — the `status` schema both carriers write,
+- `extensions/models/_lib/status.ts` — the `status` schema every carrier writes,
   and the phases a parcel goes through.
-- `extensions/models/_lib/http.ts` — HTTP helpers both carriers share. A carrier's
-  lib never imports the other carrier's, so neither package ships the other's
-  code.
+- `extensions/models/_lib/http.ts` — HTTP helpers the carriers share. A carrier's
+  lib never imports another carrier's, so no package ships another's code.
 - `extensions/models/_lib/pace.ts` — pace and ETA from the round's stop counts.
 - `extensions/models/_lib/format.ts` — times and words, shared by the report and the TUI.
 - `extensions/reports/parcel_report.ts` — `@zhann/parcel-report`, the parcel at a
   glance after every method; what someone with the extension and no TUI reads.
 - `workflows/workflow-follow-parcel.yaml` — snapshot, then follow.
 - `workflows/workflow-follow-dhl-parcel.yaml` — the same for DHL.
+- `workflows/workflow-follow-postnl-parcel.yaml` — the same for PostNL.
 - `tui/` — the terminal view; it only talks to swamp through the CLI.
 - `packages/<name>/` — one directory per published package: its `manifest.yaml`,
   and the `README.md` and `LICENSE` that ship with it. `packages_test.ts` checks
@@ -50,26 +57,30 @@ deno task check   # fmt, lint, type-check
 deno task test    # no network
 swamp workflow validate @zhann/follow-parcel
 swamp workflow validate @zhann/follow-dhl-parcel
+swamp workflow validate @zhann/follow-postnl-parcel
 ```
 
 Never point `.swamp.yaml` at a shared datastore.
 
 ## Publishing
 
-Three packages go to swamp-club, each from `packages/<name>/manifest.yaml`, with
+Four packages go to swamp-club, each from `packages/<name>/manifest.yaml`, with
 the `README.md` and `LICENSE` beside it:
 
 - `@zhann/parcel-report` — the `@zhann/parcel-report` report and the libs it
-  imports. A report name can live in only one installed package, so both carriers
-  depend on this one rather than ship their own copy.
+  imports. A report name can live in only one installed package, so every carrier
+  depends on this one rather than ship their own copy.
 - `@zhann/bpost-parcel` — the bpost behavior and `@zhann/follow-parcel`.
 - `@zhann/dhl-parcel` — the DHL behavior and `@zhann/follow-dhl-parcel`.
+- `@zhann/postnl-parcel` — the PostNL behavior and `@zhann/follow-postnl-parcel`.
+  Not pushed yet: PostNL's terms ask written consent for a "directe koppeling of
+  gateway" to its data (docs/research/postnl-tos.md); that is the owner's call.
 
-Both carrier packages list `@zhann/parcel-report` under `dependencies`, and
-neither brings the other carrier. Push `@zhann/parcel-report` first when it
+Every carrier package lists `@zhann/parcel-report` under `dependencies`, and
+none brings another carrier. Push `@zhann/parcel-report` first when it
 changes: the dry run does not check that a dependency is on the registry. The
 shared `_lib/` modules are bundled into every package that imports them, so a
-change to `status.ts` or `format.ts` means a new version of all three.
+change to `status.ts` or `format.ts` means a new version of every package.
 
 Every workflow name and behavior type carries the `@zhann/` prefix, or the push
 refuses it. A new version of a carrier package bumps `version` in its manifest

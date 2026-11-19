@@ -1,0 +1,233 @@
+{
+  "colli": {
+    "3SABCD123456789": {
+      "barcode": "3SABCD123456789",
+      "partnerBarcode": null,
+      "identification": "3SABCD123456789-BE-1000",
+      "deliveryShipmentIdentification": null,
+      "effectiveDate": "2026-11-18T00:00:00+01:00",
+      "context": {
+        "countryIsoNumber": 32,
+        "shipmentType": "Parcel"
+      },
+      "description": "1234567",
+      "emailHash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "phoneHash": "1111111111111111111111111111111111111111111111111111111111111111",
+      "deliveryAddressType": "Recipient",
+      "recipient": {
+        "names": {
+          "personName": "Rita Receiver"
+        },
+        "address": {
+          "street": "Voorbeeldstraat",
+          "houseNumber": "12",
+          "postalCode": "1000",
+          "town": "Brussel",
+          "country": "BE"
+        }
+      },
+      "sender": {
+        "names": {
+          "companyName": "Example Shop BV",
+          "personName": "Sam Sender"
+        },
+        "address": {
+          "street": "Teststraat",
+          "houseNumber": "1",
+          "houseNumberSuffix": "A",
+          "postalCode": "3600",
+          "town": "Genk",
+          "country": "BE"
+        }
+      },
+      "accountId": null,
+      "isValidated": null,
+      "isMatched": null,
+      "deliveryAddress": {
+        "names": {
+          "personName": "Rita Receiver"
+        },
+        "address": {
+          "street": "Voorbeeldstraat",
+          "houseNumber": "12",
+          "postalCode": "1000",
+          "town": "Brussel",
+          "country": "BE"
+        }
+      },
+      "retailDeliveryLocation": null,
+      "eta": {
+        "type": "WholeDay",
+        "start": "2026-11-19T08:00:00+01:00",
+        "end": "2026-11-19T21:30:00+01:00",
+        "minutesOverdue": null
+      },
+      "isDelivered": false,
+      "isAtRetailLocation": false,
+      "isPickedUpAtRetailLocation": false,
+      "isAbroadRetailLocation": false,
+      "beforeFirstDeliveryAttempt": true,
+      "expectedReturnDate": null,
+      "deliveryDate": null,
+      "isDeliveryDateChanged": false,
+      "routeInformation": null,
+      "isReturnShipment": false,
+      "hasProofOfDelivery": false,
+      "details": {
+        "cashOnDelivery": null,
+        "productCode": "4961",
+        "isBelgianProduct": true,
+        "productOptionNotifications": [],
+        "businessPartnerCode": "ABCD",
+        "businessPartnerNumber": "00000000",
+        "dimensions": {
+          "height": 52.0,
+          "width": 200.0,
+          "depth": 285.0,
+          "weight": 240.0
+        },
+        "deliveryPreferences": {
+          "hasStandardDeliveryPlace": false,
+          "hasNotAtHomeDeliveryPlace": false,
+          "hasRetailDeliveryPlace": false,
+          "isTooBigForRetail": false,
+          "hasPbaDeliveryPlace": false,
+          "hasStandardHomeAddressDeliveryPreference": false,
+          "hasStandardRetailDeliveryPreference": false,
+          "hasStandardPbaDeliveryPreference": false,
+          "hasStandardParcelLockerAtHomeDeliveryPreference": false,
+          "hasStandardSafePlaceDeliveryPreference": false,
+          "hasNotAtHomeNeighborsDeliveryPreference": false,
+          "hasNotAtHomeRetailDeliveryPreference": false,
+          "hasNotAtHomeSafePlaceDeliveryPreference": false,
+          "hasNotAtHomePbaDeliveryPreference": false
+        },
+        "productOptions": [],
+        "isRegistered": false,
+        "isInsured": false
+      },
+      "statusPhase": {
+        "index": 1,
+        "message": "Shipment received by PostNL",
+        "route": null
+      },
+      "lastObservation": "2026-11-18T23:27:44+01:00",
+      "extraInformation": [],
+      "observations": [
+        {
+          "observationDate": "2026-11-18T20:31:22.714+01:00",
+          "observationCode": "A01",
+          "description": "Shipment expected, but not yet arrived or processed at PostNL"
+        }
+      ],
+      "previouslyRerouted": false,
+      "inReroutableState": false,
+      "rerouteOptions": {
+        "otherTimeFrame": null,
+        "otherTimeFrameAvailable": false,
+        "postOfficeDelivery": false,
+        "packstationDelivery": false,
+        "reroutingUnauthorized": false,
+        "safePlaceDelivery": false,
+        "pbaDelivery": false,
+        "postOfficeDeliveryIdinFlow": false,
+        "safePlaceDeliveryIdinFlow": false,
+        "pbaDeliveryIdinFlow": false,
+        "postOfficeDeliverySustainableOption": false,
+        "pbaSustainableOption": false,
+        "isOriginalRerouteOwner": false,
+        "unavailableReasons": [
+          10
+        ]
+      },
+      "relatedCollos": [],
+      "analyticsInfo": {
+        "features": {
+          "none": "None"
+        },
+        "allObservations": [
+          {
+            "observationDate": "2026-11-18T20:31:22.714+01:00",
+            "observationCode": "A01",
+            "description": "Shipment expected, but not yet arrived or processed at PostNL"
+          },
+          {
+            "observationDate": "2026-11-18T20:31:39+01:00",
+            "observationCode": "A98",
+            "description": "Pre-alerted shipment enriched by PostNL management."
+          },
+          {
+            "observationDate": "2026-11-18T20:31:40.943+01:00",
+            "observationCode": "A95",
+            "description": "Delivery cannot be changed"
+          },
+          {
+            "observationDate": "2026-11-18T23:27:44+01:00",
+            "observationCode": "B01",
+            "description": "Shipment received by PostNL"
+          },
+          {
+            "observationDate": "2026-11-18T23:28:40.177+01:00",
+            "observationCode": "A95",
+            "description": "Delivery cannot be changed"
+          }
+        ],
+        "productOptions": [],
+        "shipmentStage": "InTransit",
+        "inAdvancePeriod": null,
+        "reroutableType": null,
+        "validationStatusInfo": {
+          "isValidated": false
+        }
+      },
+      "phaseBlock": {
+        "phaseContent": null,
+        "phaseAction": null,
+        "relatedFaqs": []
+      },
+      "showRetailMap": false,
+      "linkToNetworkPartner": null,
+      "networkPartnerName": null,
+      "networkPartnerCountry": null,
+      "customsFees": null,
+      "customerFeedbackInfo": {
+        "showFeedbackOptions": false,
+        "feedbackGiven": false
+      },
+      "isInternational": false,
+      "internationalStatus": {
+        "isForeignShipment": false,
+        "phase": "ReceivedByPostNl",
+        "delay": null
+      },
+      "showOriginalDeliveryAddress": false,
+      "alerts": [],
+      "firstMile": null,
+      "willBeReturnedAtRetail": false,
+      "retailPickupBarcode": "O3SABCD123456789",
+      "returnPickupCancelled": false,
+      "uncertainRetailLocation": false,
+      "isSustainableDelivery": false,
+      "isSustainableOption": false,
+      "safePlaceFailure": null,
+      "isPba": false,
+      "isDeliveredAtPba": false,
+      "isPickedUpAtPba": false,
+      "isPincodeAtDoorShipment": false,
+      "isInPreAnnouncedStatus": false,
+      "pincodeStatus": null,
+      "floatingChatBot": null,
+      "shipmentAdvertisement": null,
+      "thirdPartyAdvertisements": null,
+      "isPostNLIDForPilotZipCodes": false,
+      "extraAtHome": null,
+      "canBePickedUpWithPostNLId": false,
+      "isShipmentAddressChanged": false,
+      "isPbaDelivery": false,
+      "isDelayed": false,
+      "showLastUpdateDate": false,
+      "temporaryShipment": null
+    }
+  },
+  "processed": "2026-11-19T06:13:45.4187276+01:00"
+}
