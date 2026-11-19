@@ -1,0 +1,77 @@
+id: 9959f96b-1b07-4af6-b0ff-eaed3606c38d
+name: "@zhann/follow-postnl-parcel"
+description: >-
+  Follow one PostNL parcel until it is delivered or picked up: look once, so a
+  wrong barcode or postal code fails at once, then keep looking, paced by where
+  the parcel is. The country is read from the postal code (1234 AB is NL, 1234
+  BE, L-1234 LU) unless given. The run lasts as long as the parcel's journey
+  (maxHours at most); the TUI shows it while it runs.
+tags:
+  carrier: postnl
+inputs:
+  properties:
+    code:
+      type: string
+      description: The PostNL barcode, such as 3SABCD123456789.
+    postcode:
+      type: string
+      description: The delivery address's postal code; PostNL answers nothing without it.
+    country:
+      type: string
+      default: ""
+      description: The delivery address's country as two letters; empty reads it from the postal code.
+    label:
+      type: string
+      default: ""
+      description: A name for the parcel in the TUI. Empty shows the sender.
+    language:
+      type: string
+      enum: [EN, NL, FR, DE]
+      default: EN
+      description: Language of PostNL's texts.
+    maxHours:
+      type: number
+      default: 120
+      description: Give up after this many hours.
+  required: [code, postcode]
+jobs:
+  - name: follow
+    description: Look once, then follow until delivered.
+    steps:
+      - name: snapshot
+        description: >-
+          Look once and write the status; fails on a parcel PostNL does not know, or a postal
+          code whose country it cannot tell.
+        task:
+          type: behavior
+          behaviorType: "@zhann/postnl-parcel"
+          behaviorName: postnl-${{ inputs.code.lowerAscii() }}
+          methodName: snapshot
+          globalArgs:
+            itemCode: ${{ inputs.code }}
+            postalCode: ${{ inputs.postcode }}
+            country: ${{ inputs.country }}
+            label: ${{ inputs.label }}
+            language: ${{ inputs.language }}
+        dependsOn: []
+      - name: follow
+        description: Keep looking, paced by phase, until delivered, picked up, or maxHours.
+        task:
+          type: behavior
+          behaviorType: "@zhann/postnl-parcel"
+          behaviorName: postnl-${{ inputs.code.lowerAscii() }}
+          methodName: follow
+          globalArgs:
+            itemCode: ${{ inputs.code }}
+            postalCode: ${{ inputs.postcode }}
+            country: ${{ inputs.country }}
+            label: ${{ inputs.label }}
+            language: ${{ inputs.language }}
+          inputs:
+            maxHours: ${{ inputs.maxHours }}
+        dependsOn:
+          - step: snapshot
+            condition:
+              type: succeeded
+    dependsOn: []
+version: 1

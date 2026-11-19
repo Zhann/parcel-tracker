@@ -5,6 +5,7 @@
  * second. Adding a parcel starts its carrier's follow workflow detached, so the
  * follow outlives the TUI; the TUI is only ever a window onto swamp's data. A
  * code shaped like a DHL number is followed with DHL, which needs no postal
+ * code; a `3S…` barcode with PostNL, which reads the country from the postal
  * code; anything else with bpost.
  *
  * PARCEL_POSTCODE pre-fills the postal code when adding.
@@ -24,6 +25,7 @@ import {
   setArchived,
   startFollow,
 } from "./swamp.ts";
+import { countryOf } from "../extensions/models/_lib/postnl.ts";
 import { render, title, type ViewState, visibleRows } from "./view.ts";
 
 const REFRESH_MS = 5_000;
@@ -115,11 +117,17 @@ function onPromptKey(key: string) {
         // DHL needs no postal code.
         p.fields = p.fields.filter((x) => x.key !== "postcode");
       } else if (!CODE_PATTERN.test(f.value.trim())) {
-        return say("that is not a bpost or DHL tracking code");
+        return say("that is not a bpost, DHL or PostNL tracking code");
       }
     }
     if (f.key === "postcode" && !POSTCODE_PATTERN.test(f.value.trim())) {
       return say("that is not a postal code");
+    }
+    if (
+      f.key === "postcode" && carrierFor(p.fields[0].value) === "postnl" &&
+      !countryOf(f.value)
+    ) {
+      return say("PostNL needs a Belgian, Dutch or Luxembourg postal code here");
     }
     if (p.index < p.fields.length - 1) {
       p.index++;

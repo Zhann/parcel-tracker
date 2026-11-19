@@ -9,13 +9,17 @@
 import { z } from "npm:zod@4";
 
 /** The carriers a status can come from. A status without one is bpost's. */
-export const CARRIERS = ["bpost", "dhl"] as const;
+export const CARRIERS = ["bpost", "dhl", "postnl"] as const;
 
 /** A carrier, as the status records it. */
 export type Carrier = typeof CARRIERS[number];
 
 /** The carrier's name in words. */
-export const CARRIER_WORD: Record<Carrier, string> = { bpost: "bpost", dhl: "DHL" };
+export const CARRIER_WORD: Record<Carrier, string> = {
+  bpost: "bpost",
+  dhl: "DHL",
+  postnl: "PostNL",
+};
 
 /** The carrier of a status; one written before carriers were recorded is bpost's. */
 export function carrierOf(s: { carrier?: Carrier }): Carrier {
@@ -88,7 +92,10 @@ export const StatusSchema = z.object({
     knownProcessStep: z.string().nullable(),
     text: z.string(),
   }),
-  /** The carrier's own delivery window; `from` equal to `to` is a "by" time, both empty a day. */
+  /**
+   * The carrier's own delivery window; `from` equal to `to` is a "by" time, `to` empty a
+   * "from" time, both empty a day.
+   */
   window: z.object({ day: z.string(), from: z.string(), to: z.string() }).nullable(),
   roundName: z.string().nullable(),
   events: z.array(EventSchema),

@@ -338,7 +338,7 @@ async function setArchived(ctx: MethodContext, archived: boolean) {
  */
 export const model = {
   type: "@zhann/bpost-parcel",
-  version: "2026.11.11.1",
+  version: "2026.11.19.1",
   upgrades: [
     {
       toVersion: "2026.11.06.2",
@@ -381,6 +381,12 @@ export const model = {
       toVersion: "2026.11.11.1",
       description: "Its README says how to upgrade the @zhann/parcel-report report with it; " +
         "arguments unchanged.",
+      upgradeAttributes: (old: Record<string, unknown>) => old,
+    },
+    {
+      toVersion: "2026.11.19.1",
+      description: "The shared status schema gains the PostNL carrier, and a window can be " +
+        'a "from" time; arguments unchanged.',
       upgradeAttributes: (old: Record<string, unknown>) => old,
     },
   ],

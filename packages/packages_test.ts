@@ -93,11 +93,12 @@ async function localImports(entry: string): Promise<Set<string>> {
   return seen;
 }
 
-Deno.test("the three packages are published from packages/", () => {
+Deno.test("the four packages are published from packages/", () => {
   assertEquals(packages.map((p) => p.manifest.name), [
     "@zhann/bpost-parcel",
     "@zhann/dhl-parcel",
     "@zhann/parcel-report",
+    "@zhann/postnl-parcel",
   ]);
 });
 

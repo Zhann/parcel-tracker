@@ -1,7 +1,7 @@
 /**
  * Words and times for a parcel, shared by the `@zhann/parcel-report` report
  * and the TUI. Times are Brussels-local, as bpost's windows and events are;
- * DHL's are converted to it.
+ * DHL's and PostNL's are converted to it.
  *
  * @module
  */
@@ -67,11 +67,35 @@ export function fromNow(iso: string, now: Date): string {
 
 /**
  * A carrier's delivery window, seen from `now`: `today 11:10–14:15`, or
- * `tomorrow by 12:00` when it gives one time, or just the day.
+ * `tomorrow by 12:00` when it gives one time, `today from 17:00` when it
+ * gives only a start, or just the day.
  */
 export function windowText(w: { day: string; from: string; to: string }, now: Date): string {
   const day = relativeDay(w.day, now);
   if (!w.from && !w.to) return day;
+  if (!w.to) return `${day} from ${w.from}`;
   if (!w.from || w.from === w.to) return `${day} by ${w.to || w.from}`;
   return `${day} ${w.from}–${w.to}`;
+}
+
+const STAMP = /^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2})(?::\d{2}(?:\.\d+)?)?(Z|[+-]\d{2}:?\d{2})?$/;
+
+/**
+ * A carrier's ISO timestamp as a Brussels day and `HH:MM`. One without a
+ * zone is the event's local time and is kept as it is. `midnight` is true
+ * when the timestamp is 00:00 in its own zone, which DHL uses for a day with
+ * no time.
+ */
+export function localStamp(
+  raw: unknown,
+): { day: string; time: string; date: string; midnight: boolean } | null {
+  if (typeof raw !== "string") return null;
+  const m = STAMP.exec(raw.trim());
+  if (!m) return null;
+  const [, date, time, zone] = m;
+  const midnight = time === "00:00";
+  if (!zone) return { day: date, time, date, midnight };
+  const at = new Date(raw);
+  if (Number.isNaN(at.getTime())) return null;
+  return { day: brusselsDay(at), time: clock(at.toISOString()), date, midnight };
 }

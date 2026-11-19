@@ -10,7 +10,8 @@ turns the van's position into a distance.
 Unofficial: not made by, endorsed by or affiliated with bpost. It is meant for following your own
 parcels, at the same pace bpost's own tracking page looks.
 
-For DHL shipments, pull `@zhann/dhl-parcel` instead (or as well); it shows the same report.
+For DHL shipments or PostNL parcels, pull `@zhann/dhl-parcel` or `@zhann/postnl-parcel` instead (or
+as well); they show the same report.
 
 ## Follow a parcel
 

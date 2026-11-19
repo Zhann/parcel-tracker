@@ -1,13 +1,16 @@
 /**
  * The TUI's only way in or out: the swamp CLI. Reads go through
- * `swamp data query`; actions start the `@zhann/follow-parcel` or
- * `@zhann/follow-dhl-parcel` workflow or run a behavior method. Nothing here
- * reads `.swamp/` directly.
+ * `swamp data query`; actions start a carrier's follow workflow
+ * (`@zhann/follow-parcel`, `@zhann/follow-dhl-parcel` or
+ * `@zhann/follow-postnl-parcel`) or run a behavior method. Nothing here reads
+ * `.swamp/` directly.
  *
  * @module
  */
 import { BEHAVIOR_TYPE, type Round } from "../extensions/models/bpost_parcel.ts";
 import { BEHAVIOR_TYPE as DHL_BEHAVIOR_TYPE } from "../extensions/models/dhl_parcel.ts";
+import { BEHAVIOR_TYPE as POSTNL_BEHAVIOR_TYPE } from "../extensions/models/postnl_parcel.ts";
+import { countryOf } from "../extensions/models/_lib/postnl.ts";
 import { type Carrier, carrierOf, type Status } from "../extensions/models/_lib/status.ts";
 import type { Row } from "./view.ts";
 
@@ -48,8 +51,8 @@ const plainName = (s: string) => /^[\w.-]+$/.test(s);
 export async function listParcels(run: Runner): Promise<Row[]> {
   const rows = await query<Row>(
     run,
-    `(modelType == "${BEHAVIOR_TYPE}" || modelType == "${DHL_BEHAVIOR_TYPE}") && ` +
-      `specName == "status"`,
+    `(modelType == "${BEHAVIOR_TYPE}" || modelType == "${DHL_BEHAVIOR_TYPE}" || ` +
+      `modelType == "${POSTNL_BEHAVIOR_TYPE}") && specName == "status"`,
     '{"name": modelName, "status": attributes}',
   );
   return rows
@@ -72,11 +75,13 @@ export interface NewParcel {
   /** bpost when absent. */
   carrier?: Carrier;
   code: string;
-  /** Required for bpost; DHL only uses it for Parcel Germany and Netherlands. */
+  /** Required for bpost and PostNL; DHL only uses it for Parcel Germany and Netherlands. */
   postcode: string;
   label: string;
   /** DHL's service for the number; empty lets DHL find it. */
   service?: string;
+  /** PostNL's delivery country, two letters; empty reads it from the postal code. */
+  country?: string;
 }
 
 export const CODE_PATTERN = /^[A-Za-z0-9]{8,40}$/;
@@ -87,15 +92,20 @@ export const POSTCODE_PATTERN = /^[A-Za-z0-9 -]{3,10}$/;
 export const FOLLOW_WORKFLOW: Record<Carrier, string> = {
   bpost: "@zhann/follow-parcel",
   dhl: "@zhann/follow-dhl-parcel",
+  postnl: "@zhann/follow-postnl-parcel",
 };
 
 /**
  * The carrier a tracking code looks like it belongs to: a 10-digit DHL
- * Express waybill or a DHL Parcel `JJD…`/`JVGL…` number is DHL's, anything
- * else bpost's. bpost codes are 13-character S10 codes or 24 digits.
+ * Express waybill or a DHL Parcel `JJD…`/`JVGL…` number is DHL's, a `3S…`
+ * barcode PostNL's, anything else bpost's. bpost codes are 13-character S10
+ * codes or 24 digits.
  */
 export function carrierFor(code: string): Carrier {
-  return /^\d{10}$|^(JJD|JVGL)[A-Z0-9]{8,}$/i.test(code.trim()) ? "dhl" : "bpost";
+  const c = code.trim();
+  if (/^\d{10}$|^(JJD|JVGL)[A-Z0-9]{8,}$/i.test(c)) return "dhl";
+  if (/^3S[A-Z0-9]{8,}$/i.test(c)) return "postnl";
+  return "bpost";
 }
 
 /** The `swamp workflow run` arguments that follow a parcel. */
@@ -106,13 +116,25 @@ export function followArgs(repoDir: string, p: NewParcel): string[] {
     if (p.postcode && !POSTCODE_PATTERN.test(p.postcode)) {
       throw new Error("that is not a postal code");
     }
+  } else if (carrier === "postnl") {
+    if (!CODE_PATTERN.test(p.code.trim())) throw new Error("that is not a PostNL barcode");
+    if (!POSTCODE_PATTERN.test(p.postcode)) throw new Error("that is not a postal code");
+    if (!p.country && !countryOf(p.postcode)) {
+      throw new Error(
+        "PostNL needs the country for that postal code; give a Belgian, Dutch or " +
+          "Luxembourg one, or run @zhann/follow-postnl-parcel with --input country=",
+      );
+    }
   } else {
     if (!CODE_PATTERN.test(p.code)) throw new Error("that is not a bpost tracking code");
     if (!POSTCODE_PATTERN.test(p.postcode)) throw new Error("that is not a postal code");
   }
-  const inputs: Record<string, string> = { code: p.code, label: p.label };
-  if (carrier === "bpost" || p.postcode) inputs.postcode = p.postcode;
+  // PostNL's status holds the barcode in upper case; runningFollows matches on it.
+  const code = carrier === "postnl" ? p.code.trim().toUpperCase() : p.code;
+  const inputs: Record<string, string> = { code, label: p.label };
+  if (carrier !== "dhl" || p.postcode) inputs.postcode = p.postcode;
   if (carrier === "dhl" && p.service) inputs.service = p.service;
+  if (carrier === "postnl" && p.country) inputs.country = p.country;
   return [
     "workflow",
     "run",
@@ -150,7 +172,7 @@ export async function startFollow(repoDir: string, p: NewParcel): Promise<string
   return log;
 }
 
-/** Ids of the running follow runs, of either carrier, for a tracking code. */
+/** Ids of the running follow runs, of any carrier, for a tracking code. */
 export async function runningFollows(run: Runner, code: string): Promise<string[]> {
   if (!CODE_PATTERN.test(code) && !DHL_CODE_PATTERN.test(code)) return [];
   const names = Object.values(FOLLOW_WORKFLOW).map((w) => `workflowName == "${w}"`).join(" || ");
@@ -171,6 +193,15 @@ export async function parcelArgs(run: Runner, row: Row): Promise<NewParcel> {
   const r = await run(["behavior", "get", row.name, "--json"]);
   if (!r.ok) throw new Error(errorOf(r.stderr));
   const g = JSON.parse(r.stdout).globalArguments ?? {};
+  if (carrierOf(row.status) === "postnl") {
+    return {
+      carrier: "postnl",
+      code: g.itemCode,
+      postcode: g.postalCode,
+      label: g.label ?? "",
+      country: g.country ?? "",
+    };
+  }
   if (carrierOf(row.status) === "dhl") {
     return {
       carrier: "dhl",
