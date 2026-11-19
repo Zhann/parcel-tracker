@@ -38,7 +38,7 @@ jobs:
         task:
           type: behavior
           behaviorType: "@zhann/bpost-parcel"
-          behaviorName: bpost-${{ inputs.code }}
+          behaviorName: bpost-${{ inputs.code.lowerAscii() }}
           methodName: snapshot
           globalArgs:
             itemCode: ${{ inputs.code }}
@@ -51,7 +51,7 @@ jobs:
         task:
           type: behavior
           behaviorType: "@zhann/bpost-parcel"
-          behaviorName: bpost-${{ inputs.code }}
+          behaviorName: bpost-${{ inputs.code.lowerAscii() }}
           methodName: follow
           globalArgs:
             itemCode: ${{ inputs.code }}
